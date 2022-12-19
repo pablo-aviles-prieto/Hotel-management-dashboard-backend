@@ -1,1 +1,1 @@
-export { IRouter } from "./router";
+export { IRouter, IError } from './router';
