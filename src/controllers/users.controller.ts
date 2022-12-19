@@ -20,3 +20,18 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
   const token = jwtTokenGenerator({ id: 0, email });
   res.status(200).json({ token });
 };
+
+export const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+  res.status(200).json(`Single User ${userId}`);
+};
+
+export const editUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+  res.status(200).json(`Edit User ${userId}`);
+};
+
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+  res.status(200).json(`Delete User ${userId}`);
+};

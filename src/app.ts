@@ -18,6 +18,6 @@ loaders.createPassportInstance();
 
 app.use(errorHandler);
 
-http
+export const httpServer = http
   .createServer(app)
   .listen(PORT, () => console.info(`Server running and listening at http://localhost:${PORT}. Accepting petitions from ${DOMAIN}`));
