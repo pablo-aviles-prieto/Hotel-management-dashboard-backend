@@ -1,37 +1,42 @@
 import { Request, Response, NextFunction } from 'express';
-import { jwtTokenGenerator } from '../utils';
+import * as fs from 'fs';
+import { resolve } from 'path';
+import { IUsers } from '../interfaces';
 
-export const createNewUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { email } = req.body;
-  // TODO if user exists
-  // TODO if hashed password matches
+const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
 
-  const token = jwtTokenGenerator({ id: 0, email });
-
-  res.status(200).json({ token });
+export const getUsersList = async (req: Request, res: Response, next: NextFunction) => {
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  const usersList: IUsers[] = JSON.parse(rawData);
+  res.status(200).json(usersList);
 };
 
-export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body;
-  // TODO if email matches
-  // TODO if hashed password matches
-  if (email !== 'test@test.com') return res.status(400).send('Not my hardcoded user');
-
-  const token = jwtTokenGenerator({ id: 0, email });
-  res.status(200).json({ token });
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  const usersList: IUsers[] = JSON.parse(rawData);
+  res.status(200).json(usersList);
 };
 
 export const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
-  res.status(200).json(`Single User ${userId}`);
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  const usersList: IUsers[] = JSON.parse(rawData);
+  const getUser = usersList.find((user) => user.id === +userId);
+  res.status(200).json(getUser);
 };
 
 export const editUser = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
-  res.status(200).json(`Edit User ${userId}`);
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  const usersList: IUsers[] = JSON.parse(rawData);
+  const getUser = usersList.find((user) => user.id === +userId);
+  res.status(200).json(getUser);
 };
 
 export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
-  res.status(200).json(`Delete User ${userId}`);
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  const usersList: IUsers[] = JSON.parse(rawData);
+  const newUsersList = usersList.filter((user) => user.id !== +userId);
+  res.status(200).json(newUsersList);
 };
