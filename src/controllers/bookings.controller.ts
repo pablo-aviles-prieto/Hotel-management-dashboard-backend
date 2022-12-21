@@ -1,24 +1,24 @@
-import { Request, Response, NextFunction } from 'express';
 import * as fs from 'fs';
 import { resolve } from 'path';
+import { Request, Response, NextFunction } from 'express';
 import { IBookings } from '../interfaces';
 
 const pathToJSONData = resolve(__dirname, '../assets/data/bookings.json');
 
-export const getBookingsList = async (req: Request, res: Response, next: NextFunction) => {
+export const getBookingsList = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
   console.log('req.user', req.user);
   res.status(200).json(bookingsList);
 };
 
-export const createBooking = async (req: Request, res: Response, next: NextFunction) => {
+export const createBooking = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
   res.status(200).json(bookingsList);
 };
 
-export const getSingleBooking = async (req: Request, res: Response, next: NextFunction) => {
+export const getSingleBooking = (req: Request, res: Response, _next: NextFunction) => {
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
@@ -26,7 +26,7 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
   res.status(200).json(getBooking);
 };
 
-export const editBooking = async (req: Request, res: Response, next: NextFunction) => {
+export const editBooking = (req: Request, res: Response, _next: NextFunction) => {
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
@@ -34,7 +34,7 @@ export const editBooking = async (req: Request, res: Response, next: NextFunctio
   res.status(200).json(getBooking);
 };
 
-export const deleteBooking = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteBooking = (req: Request, res: Response, _next: NextFunction) => {
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
