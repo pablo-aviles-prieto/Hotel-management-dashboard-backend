@@ -10,7 +10,7 @@ export const createNewUser = (req: Request, res: Response, _next: NextFunction) 
 };
 
 export const loginUser = (req: Request, res: Response, _next: NextFunction) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
   // TODO if email matches
   // TODO if hashed password matches
   if (email !== 'test@test.com') return res.status(400).send('Not my hardcoded user');

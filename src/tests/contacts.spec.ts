@@ -3,43 +3,43 @@ import { resolve } from 'path';
 import request from 'supertest';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
-import { IBookings } from '../interfaces';
+import { IContacts } from '../interfaces';
 
-let bookingsList: IBookings[] = [];
+let contactsList: IContacts[] = [];
 let jwtTokenCorrect: string | null = '';
 let jwtTokenIncorrect: string | null = '';
 
 beforeAll(() => {
-  const pathToJSONData = resolve(__dirname, '../assets/data/bookings.json');
+  const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
   const rawData = fs.readFileSync(pathToJSONData).toString();
-  bookingsList = JSON.parse(rawData);
+  contactsList = JSON.parse(rawData);
 
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
   jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
 });
 
-describe('Bookings endpoints', () => {
-  it(`/bookings (GET) returns 200 and IBookings[] when correct JWT provided`, async () => {
+describe('Contacts endpoints', () => {
+  it(`/contacts (GET) returns 200 and IContacts[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/bookings/')
+      .get('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IBookings[]>(bookingsList);
+    expect(res.body).toStrictEqual<IContacts[]>(contactsList);
   });
-  it(`/bookings (GET) return 401 Unauthorized when no JWT provided`, async () => {
-    const res = await request(httpServer).get('/bookings/').expect(401);
+  it(`/contacts (GET) return 401 Unauthorized when no JWT provided`, async () => {
+    const res = await request(httpServer).get('/contacts/').expect(401);
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
     expect(res.text).toMatch('Unauthorized');
   });
-  it(`/bookings (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/bookings/')
+      .get('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -48,20 +48,20 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings (POST) returns 200 and IBookings[] when correct JWT provided`, async () => {
+  it(`/contacts (POST) returns 200 and IContacts[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .post('/bookings/')
+      .post('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IBookings[]>(bookingsList);
+    expect(res.body).toStrictEqual<IContacts[]>(contactsList);
   });
-  it(`/bookings (POST) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts (POST) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .post('/bookings/')
+      .post('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -70,20 +70,20 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1 (GET) returns 200 and the 1st obj from IBookings[] when correct JWT provided`, async () => {
+  it(`/contacts/1 (GET) returns 200 and the 1st obj from IContacts[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/bookings/1')
+      .get('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IBookings>(bookingsList[0]);
+    expect(res.body).toStrictEqual<IContacts>(contactsList[0]);
   });
-  it(`/bookings/1 (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1 (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/bookings/1')
+      .get('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -92,20 +92,20 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1 (PATCH) returns 200 and the modified IBookings obj when correct JWT provided`, async () => {
+  it(`/contacts/1 (PATCH) returns 200 and the modified IContacts obj when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/bookings/1')
+      .patch('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IBookings>(bookingsList[0]);
+    expect(res.body).toStrictEqual<IContacts>(contactsList[0]);
   });
-  it(`/bookings/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/bookings/1')
+      .patch('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -114,22 +114,22 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1 (DELETE) returns 200 and IBookings[] updated when correct JWT provided`, async () => {
-    const filteredArray = bookingsList.filter((booking) => booking.id !== 1);
+  it(`/contacts/1 (DELETE) returns 200 and IContacts[] updated when correct JWT provided`, async () => {
+    const filteredArray = contactsList.filter((contact) => contact.id !== 1);
 
     const res = await request(httpServer)
-      .delete('/bookings/1')
+      .delete('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IBookings[]>(filteredArray);
+    expect(res.body).toStrictEqual<IContacts[]>(filteredArray);
   });
-  it(`/bookings/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .delete('/bookings/1')
+      .delete('/contacts/1')
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 

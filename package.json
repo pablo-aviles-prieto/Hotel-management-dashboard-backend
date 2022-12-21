@@ -12,7 +12,7 @@
     "lint": "eslint ./src",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier --config .prettierrc --write src/**/*.ts",
-    "test": "jest --config jest.json",
+    "test": "jest --config jest.json --runInBand",
     "test:watch": "jest --watch --config jest.json",
     "test:coverage": "jest --config jest.json --collectCoverage && codecov",
     "test:openhandles": "jest --detectOpenHandles"

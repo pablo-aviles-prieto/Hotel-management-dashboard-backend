@@ -1,13 +1,13 @@
 import { sign } from 'jsonwebtoken';
 
-interface IUser {
+export interface IJWTUser {
   id: number | string;
   email: string;
 }
 
 const { JWT_PRIVATE } = process.env;
 
-export const jwtTokenGenerator = (user: IUser) => {
+export const jwtTokenGenerator = (user: IJWTUser): (string | null) => {
   return JWT_PRIVATE
     ? sign(
         {

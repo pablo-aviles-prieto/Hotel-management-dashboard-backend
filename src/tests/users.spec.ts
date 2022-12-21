@@ -5,14 +5,20 @@ import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
 import { IUsers } from '../interfaces';
 
-const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
-const rawData = fs.readFileSync(pathToJSONData).toString();
-const usersList: IUsers[] = JSON.parse(rawData);
+let usersList: IUsers[] = [];
+let jwtTokenCorrect: string | null = '';
+let jwtTokenIncorrect: string | null = '';
 
-const jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
-const jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+beforeAll(() => {
+  const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
+  const rawData = fs.readFileSync(pathToJSONData).toString();
+  usersList = JSON.parse(rawData);
 
-describe('Bookings endpoints', () => {
+  jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
+  jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+});
+
+describe('Users endpoints', () => {
   it(`/users (GET) returns 200 and IUsers[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .get('/users/')
@@ -86,7 +92,7 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/users/1 (PATCH) returns 200 and the 1st obj from IUsers[] when correct JWT provided`, async () => {
+  it(`/users/1 (PATCH) returns 200 and the modified IUsers obj when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .patch('/users/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
@@ -132,4 +138,7 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 });
-httpServer.close();
+
+afterAll(() => {
+  httpServer.close();
+});

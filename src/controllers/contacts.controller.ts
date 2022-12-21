@@ -8,7 +8,7 @@ const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
 export const getContactsList = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
-  console.log('req.user', req.user);
+  // console.log('req.user', req.user);
   res.status(200).json(contactsList);
 };
 

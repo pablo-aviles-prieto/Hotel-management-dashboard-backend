@@ -8,14 +8,13 @@ const pathToJSONData = resolve(__dirname, '../assets/data/rooms.json');
 export const getRoomsList = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const roomsList: IRooms[] = JSON.parse(rawData);
-  console.log('req.user', req.user);
+  // console.log('req.user', req.user);
   res.status(200).json(roomsList);
 };
 
 export const createRoom = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const roomsList: IRooms[] = JSON.parse(rawData);
-  console.log('req.user', req.user);
   res.status(200).json(roomsList);
 };
 
