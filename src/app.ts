@@ -10,7 +10,6 @@ const app = express();
 const { DOMAIN, PORT } = process.env;
 
 app.use(cors({ origin: DOMAIN }));
-// app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 loaders.router(app);
