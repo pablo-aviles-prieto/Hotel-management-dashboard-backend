@@ -5,10 +5,7 @@ describe('Auth endpoints', () => {
   it(`/login (POST) return 200 and the JWT when hardcoded 'test@test.com' is provided`, async () => {
     const res = await request(httpServer)
       .post('/login')
-      .send({
-        email: 'test@test.com',
-        password: 'test'
-      })
+      .send({ email: 'test@test.com', password: 'test' })
       .set('Content-Type', 'application/json')
       .expect(200)
       .expect('Content-Type', /json/);
