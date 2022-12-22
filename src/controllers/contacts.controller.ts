@@ -5,20 +5,20 @@ import { IContacts } from '../interfaces';
 
 const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
 
-export const getContactsList = async (req: Request, res: Response, next: NextFunction) => {
+export const getContactsList = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
-  console.log('req.user', req.user);
+  // console.log('req.user', req.user);
   res.status(200).json(contactsList);
 };
 
-export const createContact = async (req: Request, res: Response, next: NextFunction) => {
+export const createContact = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
   res.status(200).json(contactsList);
 };
 
-export const getSingleContact = async (req: Request, res: Response, next: NextFunction) => {
+export const getSingleContact = (req: Request, res: Response, _next: NextFunction) => {
   const { contactId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
@@ -26,7 +26,7 @@ export const getSingleContact = async (req: Request, res: Response, next: NextFu
   res.status(200).json(getContact);
 };
 
-export const editContact = async (req: Request, res: Response, next: NextFunction) => {
+export const editContact = (req: Request, res: Response, _next: NextFunction) => {
   const { contactId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
@@ -34,7 +34,7 @@ export const editContact = async (req: Request, res: Response, next: NextFunctio
   res.status(200).json(getContact);
 };
 
-export const deleteContact = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteContact = (req: Request, res: Response, _next: NextFunction) => {
   const { contactId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);

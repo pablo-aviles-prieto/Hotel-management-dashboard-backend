@@ -15,10 +15,10 @@
   "parserOptions": {
     "project": ["./tsconfig.json"]
   },
-  "quotes": ["error", "single"],
   "rules": {
+    "quotes": ["error", "single", { "allowTemplateLiterals": true }],
     "prettier": 0,
-    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "no-console": ["error", { "allow": ["warn", "error", "info", "log"] }],
     "object-literal-sort-keys": 0,
     "no-unused-expression": 0,
     "@typescript-eslint/no-unsafe-assignment": 0,
