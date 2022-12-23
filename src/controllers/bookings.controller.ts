@@ -23,6 +23,11 @@ export const getSingleBooking = (req: Request, res: Response, _next: NextFunctio
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
   const getBooking = bookingsList.find((booking) => booking.id === +bookingId);
+
+  if (!getBooking) {
+    res.status(422).end();
+    return;
+  }
   res.status(200).json(getBooking);
 };
 
@@ -31,13 +36,39 @@ export const editBooking = (req: Request, res: Response, _next: NextFunction) =>
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
   const getBooking = bookingsList.find((booking) => booking.id === +bookingId);
-  res.status(200).json(getBooking);
+
+  if (!getBooking) {
+    res.status(422).end();
+    return;
+  }
+
+  const newBookingsArr = [...bookingsList];
+  const indexOfObj = newBookingsArr.findIndex((obj) => obj.id === +bookingId);
+  newBookingsArr[indexOfObj] = {
+    ...newBookingsArr[indexOfObj],
+    ...req.body
+  };
+
+  res.status(200).json(newBookingsArr);
 };
 
 export const deleteBooking = (req: Request, res: Response, _next: NextFunction) => {
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
-  const newBookingsList = bookingsList.filter((booking) => booking.id !== +bookingId);
-  res.status(200).json(newBookingsList);
+
+  const bookingSelected = bookingsList.find((booking) => booking.id === +bookingId);
+
+  // await new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve('');
+  //   }, 2000);
+  // });
+
+  if (!bookingSelected) {
+    res.status(422).end();
+    return;
+  }
+
+  res.status(200).end();
 };

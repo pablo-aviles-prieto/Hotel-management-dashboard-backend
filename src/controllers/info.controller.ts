@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 
 export const showRoutesInfo = (req: Request, res: Response, _next: NextFunction) => {
   const routesInfo = `
-  <h2>Hotel Miranda dashboard endpoints</h2>
+  <h2>Hotel Miranda endpoints, by Pablo Avilés</h2>
   <div>
   </div>
     <p><strong>Auth</strong> routes:</p>
