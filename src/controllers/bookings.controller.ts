@@ -15,7 +15,9 @@ export const getBookingsList = (req: Request, res: Response, _next: NextFunction
 export const createBooking = (req: Request, res: Response, _next: NextFunction) => {
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
-  res.status(200).json(bookingsList);
+  //TODO Check inputs before saving on DB
+  //TODO Return the created Obj
+  res.status(201).json(bookingsList);
 };
 
 export const getSingleBooking = (req: Request, res: Response, _next: NextFunction) => {
@@ -23,7 +25,6 @@ export const getSingleBooking = (req: Request, res: Response, _next: NextFunctio
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
   const getBooking = bookingsList.find((booking) => booking.id === +bookingId);
-
   if (!getBooking) {
     res.status(422).end();
     return;
@@ -42,6 +43,8 @@ export const editBooking = (req: Request, res: Response, _next: NextFunction) =>
     return;
   }
 
+  //TODO Check inputs before saving on DB
+
   const newBookingsArr = [...bookingsList];
   const indexOfObj = newBookingsArr.findIndex((obj) => obj.id === +bookingId);
   newBookingsArr[indexOfObj] = {
@@ -49,7 +52,7 @@ export const editBooking = (req: Request, res: Response, _next: NextFunction) =>
     ...req.body
   };
 
-  res.status(200).json(newBookingsArr);
+  res.status(202).json(newBookingsArr);
 };
 
 export const deleteBooking = (req: Request, res: Response, _next: NextFunction) => {
@@ -70,5 +73,5 @@ export const deleteBooking = (req: Request, res: Response, _next: NextFunction) 
     return;
   }
 
-  res.status(200).end();
+  res.status(204).end();
 };
