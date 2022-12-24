@@ -48,11 +48,11 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms (POST) returns 200 and IRooms[] when correct JWT provided`, async () => {
+  it(`/rooms (POST) returns 201 and IRooms[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .post('/rooms/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
@@ -92,16 +92,16 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms/1 (PATCH) returns 200 and the modified IRooms obj when correct JWT provided`, async () => {
+  it(`/rooms/1 (PATCH) returns 202 and IRooms[] updated when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .patch('/rooms/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(202)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms>(roomsList[0]);
+    expect(res.body).toStrictEqual<IRooms[]>(roomsList);
   });
   it(`/rooms/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -114,18 +114,14 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms/1 (DELETE) returns 200 and IRooms[] updated when correct JWT provided`, async () => {
-    const filteredArray = roomsList.filter((room) => room.id !== 1);
-
+  it(`/rooms/1 (DELETE) returns 204 and void when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .delete('/rooms/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
-      .expect('Content-Type', /json/);
+      .expect(204);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms[]>(filteredArray);
   });
   it(`/rooms/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)

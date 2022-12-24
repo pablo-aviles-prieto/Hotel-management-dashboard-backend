@@ -48,11 +48,11 @@ describe('Users endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/users/ (POST) returns 200 and IUsers[] when correct JWT provided`, async () => {
+  it(`/users/ (POST) returns 201 and IUsers[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .post('/users/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
@@ -92,16 +92,16 @@ describe('Users endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/users/1 (PATCH) returns 200 and the modified IUsers obj when correct JWT provided`, async () => {
+  it(`/users/1 (PATCH) returns 202 and IUsers[] updated when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .patch('/users/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(202)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers>(usersList[0]);
+    expect(res.body).toStrictEqual<IUsers[]>(usersList);
   });
   it(`/users/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -114,18 +114,14 @@ describe('Users endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/users/1 (DELETE) returns 200 and IUsers[] updated when correct JWT provided`, async () => {
-    const filteredArray = usersList.filter((user) => user.id !== 1);
-
+  it(`/users/1 (DELETE) returns 204 and void when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .delete('/users/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
-      .expect('Content-Type', /json/);
+      .expect(204);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers[]>(filteredArray);
   });
   it(`/users/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)

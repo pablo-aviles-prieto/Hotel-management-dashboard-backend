@@ -48,11 +48,11 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings (POST) returns 200 and IBookings[] when correct JWT provided`, async () => {
+  it(`/bookings (POST) returns 201 and IBookings[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .post('/bookings/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(201)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
@@ -92,11 +92,11 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1 (PATCH) returns 200 and IBookings[] when correct JWT provided`, async () => {
+  it(`/bookings/1 (PATCH) returns 202 and IBookings[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .patch('/bookings/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200)
+      .expect(202)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
@@ -114,11 +114,11 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1 (DELETE) returns 200 and void when correct JWT provided`, async () => {
+  it(`/bookings/1 (DELETE) returns 204 and void when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .delete('/bookings/1')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(200);
+      .expect(204);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
