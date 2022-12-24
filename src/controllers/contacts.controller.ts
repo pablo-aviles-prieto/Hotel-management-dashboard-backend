@@ -59,7 +59,7 @@ export const deleteContact = (req: Request, res: Response, _next: NextFunction) 
   const { contactId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const contactsList: IContacts[] = JSON.parse(rawData);
-  const contactSelected = contactsList.find((contact) => contact.id !== +contactId);
+  const contactSelected = contactsList.find((contact) => contact.id === +contactId);
 
   // await new Promise((resolve) => {
   //   setTimeout(() => {

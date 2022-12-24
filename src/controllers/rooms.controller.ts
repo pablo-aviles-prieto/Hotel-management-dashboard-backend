@@ -64,7 +64,7 @@ export const deleteRoom = (req: Request, res: Response, _next: NextFunction) => 
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const roomsList: IRooms[] = JSON.parse(rawData);
 
-  const roomSelected = roomsList.find((room) => room.id !== +roomId);
+  const roomSelected = roomsList.find((room) => room.id === +roomId);
 
   if (!roomSelected) {
     res.status(422).end();

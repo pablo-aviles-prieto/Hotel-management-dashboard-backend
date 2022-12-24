@@ -1,6 +1,6 @@
 import * as fs from 'fs';
-import { resolve } from 'path';
 import { Request, Response, NextFunction } from 'express';
+import { resolve } from 'path';
 import { IBookings } from '../interfaces';
 
 const pathToJSONData = resolve(__dirname, '../assets/data/bookings.json');
