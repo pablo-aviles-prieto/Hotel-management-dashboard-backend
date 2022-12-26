@@ -17,4 +17,4 @@ Hotel Miranda REST API handling the server-side logic of the hotel. Accepting pe
 ## 💻 Take a look
 
   
-To the dashboard frontend that feeds from this REST API [https://pablo-aviles-prieto.github.io/Hotel-management-dashboard-frontend/](https://pablo-aviles-prieto.github.io/Hotel-management-dashboard-frontend/)
+Watch out the dashboard frontend that feeds from this REST API [https://pablo-aviles-prieto.github.io/Hotel-management-dashboard-frontend/](https://pablo-aviles-prieto.github.io/Hotel-management-dashboard-frontend/)
