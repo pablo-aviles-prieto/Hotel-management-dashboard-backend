@@ -1,8 +1,8 @@
-import { db } from './database';
+import { db } from '../database';
 
 const createRoomsTable = async () => {
   const query = `
-  CREATE TABLE hotel_miranda.rooms (
+  CREATE TABLE rooms (
     roomId INT NOT NULL AUTO_INCREMENT,
     photo VARCHAR(255) NOT NULL,
     roomNumber INT NOT NULL,
@@ -13,6 +13,7 @@ const createRoomsTable = async () => {
     ratePerNight INT NOT NULL,
     status VARCHAR(255) NOT NULL,
     offerPrice INT NULL,
+    bookingsIdArray JSON NULL,
     PRIMARY KEY (roomId))
   ENGINE = InnoDB
   `;

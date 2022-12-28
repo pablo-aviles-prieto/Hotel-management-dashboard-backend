@@ -1,16 +1,15 @@
-import { db } from './database';
+import { db } from '../database';
 
 const createContactsTable = async () => {
   const query = `
-  CREATE TABLE hotel_miranda.contacts (
+    CREATE TABLE contacts (
     contactId INT NOT NULL AUTO_INCREMENT,
     date DATE NOT NULL,
     messageSubject VARCHAR(255) NOT NULL,
-    messageBody VARCHAR(255) NOT NULL,
-    rate INT NOT NULL,
+    messageBody LONGTEXT NOT NULL,
     archived TINYINT NOT NULL,
     PRIMARY KEY (contactId))
-  ENGINE = InnoDB
+    ENGINE = InnoDB
   `;
   const [result] = await db.query(query);
   console.log('result', result);
