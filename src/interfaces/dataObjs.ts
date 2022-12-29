@@ -3,11 +3,15 @@ import { RowDataPacket } from 'mysql2';
 export interface IContacts {
   id: number;
   date: string;
-  user: { name: string; email: string; phone: string };
-  message: { subject: string; body: string };
-  rate: number;
-  archived?: boolean;
+  userName?: string;
+  userEmail?: string;
+  userPhone?: string;
+  messageSubject?: string;
+  messageBody?: string;
+  archived: number;
 }
+
+export interface IContactsRow extends IContacts, RowDataPacket {}
 
 export interface IUsers {
   id?: number;

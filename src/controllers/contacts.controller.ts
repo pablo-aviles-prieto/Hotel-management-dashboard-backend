@@ -1,76 +1,144 @@
 import { Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
-import { resolve } from 'path';
-import { IContacts } from '../interfaces';
+import { db } from '../data/database';
+import { IContactsRow } from '../interfaces';
+import { OkPacket, RowDataPacket } from 'mysql2';
 
-const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
-
-export const getContactsList = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
+export const getContactsList = async (req: Request, res: Response, next: NextFunction) => {
+  const query = `SELECT * FROM contacts`;
   // console.log('req.user', req.user);
-  res.status(200).json(contactsList);
-};
 
-export const createContact = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  //TODO Check inputs before saving on DB
-  //TODO Return the created Obj
-  res.status(201).json(contactsList);
-};
-
-export const getSingleContact = (req: Request, res: Response, _next: NextFunction) => {
-  const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const getContact = contactsList.find((contact) => contact.id === +contactId);
-  if (!getContact) {
-    res.status(422).end();
-    return;
+  try {
+    const [rawContactsList] = await db.query<IContactsRow[]>(query);
+    const contactsList = rawContactsList.map((contact) => {
+      const updatedObj = {
+        ...contact,
+        date: new Date(contact.date).toISOString().substring(0, 10),
+        user: {
+          name: contact.userName,
+          email: contact.userEmail,
+          phone: contact.userPhone
+        },
+        message: {
+          subject: contact.messageSubject,
+          body: contact.messageBody
+        },
+        archived: contact.archived ? true : false
+      };
+      delete updatedObj.userName;
+      delete updatedObj.userEmail;
+      delete updatedObj.userPhone;
+      delete updatedObj.messageSubject;
+      delete updatedObj.messageBody;
+      return updatedObj;
+    });
+    res.status(200).json({ result: contactsList });
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(getContact);
 };
 
-export const editContact = (req: Request, res: Response, _next: NextFunction) => {
-  const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const getContact = contactsList.find((contact) => contact.id === +contactId);
-
-  if (!getContact) {
-    res.status(422).end();
-    return;
-  }
-
-  //TODO Check inputs before saving on DB
-
-  const newContactsArr = [...contactsList];
-  const indexOfObj = newContactsArr.findIndex((obj) => obj.id === +contactId);
-  newContactsArr[indexOfObj] = {
-    ...newContactsArr[indexOfObj],
-    ...req.body
+export const createContact = async (req: Request, res: Response, next: NextFunction) => {
+  const query = `INSERT INTO contacts SET ?`;
+  const { user, message, archived } = req.body;
+  //Initializing archived property as false when created a new contact.
+  const contactToInsertOnDB = {
+    date: new Date().toISOString().substring(0, 10),
+    userName: user.name,
+    userEmail: user.email,
+    userPhone: user.phone,
+    messageSubject: message.subject,
+    messageBody: message.body,
+    archived: archived !== undefined ? archived : false
   };
 
-  res.status(202).json(newContactsArr);
+  try {
+    //TODO Check inputs before saving on DB
+    const [resultCreatingContact] = await db.query<OkPacket>(query, contactToInsertOnDB);
+    const insertedObj = {
+      ...req.body,
+      id: resultCreatingContact.insertId,
+      date: contactToInsertOnDB.date,
+      archived: false
+    };
+    res.status(201).json({ result: insertedObj });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const deleteContact = (req: Request, res: Response, _next: NextFunction) => {
+export const getSingleContact = async (req: Request, res: Response, next: NextFunction) => {
   const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const contactSelected = contactsList.find((contact) => contact.id === +contactId);
+  const query = `SELECT * FROM contacts WHERE id = ?`;
 
-  // await new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     resolve('');
-  //   }, 2000);
-  // });
+  try {
+    const [getContact] = await db.query<IContactsRow[]>(query, parseInt(contactId));
+    if (getContact.length === 0)
+      return res.status(400).json({ result: 'Error fetching the contact' });
 
-  if (!contactSelected) {
-    res.status(422).end();
-    return;
+    const parsedContact = {
+      ...getContact[0],
+      user: {
+        name: getContact[0].userName,
+        email: getContact[0].userEmail,
+        phone: getContact[0].userPhone
+      },
+      message: {
+        subject: getContact[0].messageSubject,
+        body: getContact[0].messageBody
+      },
+      date: new Date(getContact[0].date).toISOString().substring(0, 10),
+      archived: getContact[0].archived ? true : false
+    };
+    delete parsedContact.userName;
+    delete parsedContact.userEmail;
+    delete parsedContact.userPhone;
+    delete parsedContact.messageSubject;
+    delete parsedContact.messageBody;
+
+    res.status(200).json({ result: parsedContact });
+  } catch (error) {
+    next(error);
   }
+};
 
-  res.status(204).end();
+export const editContact = async (req: Request, res: Response, next: NextFunction) => {
+  const { contactId } = req.params;
+  const queryGetContact = `SELECT * FROM contacts WHERE id = ?`;
+  const queryEdit = `UPDATE contacts SET ? WHERE id = ?`;
+  const { user, message, archived } = req.body;
+
+  try {
+    const [getContact] = await db.query<RowDataPacket[]>(queryGetContact, parseInt(contactId));
+    if (getContact.length === 0)
+      return res.status(400).json({ result: 'Error editing the contact' });
+
+    const contactToUpdateOnDB = {
+      userName: user?.name ? user.name : getContact[0].userName,
+      userEmail: user?.email ? user.email : getContact[0].userEmail,
+      userPhone: user?.phone ? user.phone : getContact[0].userPhone,
+      messageSubject: message?.subject ? message.subject : getContact[0].messageSubject,
+      messageBody: message?.body ? message.body : getContact[0].messageBody,
+      archived: archived !== undefined ? archived : getContact[0].archived
+    };
+    //TODO Check inputs before saving on DB
+    await db.query<OkPacket>(queryEdit, [contactToUpdateOnDB, parseInt(contactId)]);
+    res.status(202).json({ result: 'Contact updated successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteContact = async (req: Request, res: Response, next: NextFunction) => {
+  const { contactId } = req.params;
+  const query = `DELETE FROM contacts WHERE id = ?`;
+  try {
+    const [result] = await db.query<OkPacket>(query, parseInt(contactId));
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ result: 'Error deleting the selected contact' });
+    }
+
+    res.status(202).json({ result: 'Contact deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
 };

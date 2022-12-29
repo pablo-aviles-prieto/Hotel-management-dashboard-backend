@@ -5,6 +5,9 @@ const createContactsTable = async () => {
     CREATE TABLE contacts (
     id INT NOT NULL AUTO_INCREMENT,
     date DATE NOT NULL,
+    userName VARCHAR(255) NOT NULL,
+    userEmail VARCHAR(255) NOT NULL,
+    userPhone VARCHAR(255) NOT NULL,
     messageSubject VARCHAR(255) NOT NULL,
     messageBody LONGTEXT NOT NULL,
     archived TINYINT NOT NULL,

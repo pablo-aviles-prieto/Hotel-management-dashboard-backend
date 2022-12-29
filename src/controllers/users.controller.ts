@@ -33,8 +33,8 @@ export const getUsersList = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const queryPost = `INSERT INTO users SET ?`;
   const queryGet = `SELECT * FROM users WHERE email = ?`;
+  const queryPost = `INSERT INTO users SET ?`;
   const { photo, name, email, password, startDate, job, contact, status } = req.body;
   const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
   const hashedPassword = await hash(password, salt);
@@ -112,7 +112,7 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
       email: email ? email : getUser[0].email,
       password: password ? await hash(password, salt) : getUser[0].password,
       startDate: startDate ? startDate : getUser[0].startDate,
-      jobPosition: job.position ? job.position : getUser[0].position,
+      jobPosition: job.position ? job.position : getUser[0].jobPosition,
       jobDescription: job.description ? job.description : getUser[0].jobDescription,
       jobSchedule: job.schedule ? job.schedule : getUser[0].jobSchedule,
       contact: contact ? contact : getUser[0].contact,
@@ -121,7 +121,7 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
 
     //TODO Check inputs before saving on DB
     await db.query<OkPacket>(queryEdit, [userToUpdateOnDB, parseInt(userId)]);
-    res.status(200).json({ result: 'User updated successfully' });
+    res.status(202).json({ result: 'User updated successfully' });
   } catch (error) {
     next(error);
   }
@@ -136,7 +136,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
       return res.status(404).json({ result: 'Error deleting the selected user' });
     }
 
-    res.status(200).json({ result: 'User deleted successfully' });
+    res.status(202).json({ result: 'User deleted successfully' });
   } catch (error) {
     next(error);
   }
