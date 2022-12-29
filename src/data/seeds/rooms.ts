@@ -16,6 +16,7 @@ const insertUserData = async () => {
     max: 9999
   });
   const randomRoomName = faker.animal.fish();
+  const randomDescription = 'Random description for this room';
   const fakeBedType = ['Double superior', 'Single bed', 'Double bed'];
   const randomNumberForBedType = faker.datatype.number({
     min: 0,
@@ -49,10 +50,10 @@ const insertUserData = async () => {
   });
 
   const query = `
-    INSERT INTO rooms (photo, roomNumber, roomName, bedType, roomFloor, facilities, ratePerNight, status)
+    INSERT INTO rooms (photo, roomNumber, roomName, bedType, roomFloor, roomDescription, facilities, ratePerNight, status)
     VALUES ('${fakePhotos[randomNumberForPhotos]}', '${randomRoomNumber}', '${randomRoomName}', '${
     fakeBedType[randomNumberForBedType]
-  }', '${fakeRoomFloor[randomNumberForRoomFloor]}', '${JSON.stringify(
+  }', '${fakeRoomFloor[randomNumberForRoomFloor]}', '${randomDescription}', '${JSON.stringify(
     fakeFacilities[randomNumberForFacilities]
   )}', '${randomRatePerNight}', '${fakeStatus[randomNumberForStatus]}')
   `;

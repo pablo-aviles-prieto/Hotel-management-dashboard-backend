@@ -36,11 +36,13 @@ export interface IRooms {
   roomName: string;
   bedType: string;
   roomFloor: string;
-  facilities: string[];
+  facilities: string;
   ratePerNight: number;
   status: string;
   offerPrice: string | null;
 }
+
+export interface IRoomsRow extends IRooms, RowDataPacket {}
 
 export interface IBookings {
   id: number;
@@ -53,3 +55,5 @@ export interface IBookings {
   roomType: string;
   status: string;
 }
+
+export interface IBookingsRow extends IBookings, RowDataPacket {}

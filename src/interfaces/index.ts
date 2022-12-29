@@ -1,2 +1,11 @@
 export { IRouter, IError } from './router';
-export { IContacts, IUsers, IRooms, IBookings, IUsersRow, IContactsRow } from './dataObjs';
+export {
+  IContacts,
+  IContactsRow,
+  IUsers,
+  IUsersRow,
+  IRooms,
+  IRoomsRow,
+  IBookings,
+  IBookingsRow
+} from './dataObjs';
