@@ -3,7 +3,7 @@ import { db } from '../database';
 const createBookingsTable = async () => {
   const query = `
     CREATE TABLE bookings (
-    bookingId INT NOT NULL AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT,
     bookingNumber INT NOT NULL,
     orderDate DATE NOT NULL,
     checkIn DATE NOT NULL,
@@ -12,9 +12,9 @@ const createBookingsTable = async () => {
     roomType VARCHAR(255) NOT NULL,
     status VARCHAR(255) NOT NULL,
     roomId INT NOT NULL,
-    PRIMARY KEY (bookingId),
+    PRIMARY KEY (id),
     FOREIGN KEY (roomId)
-    REFERENCES rooms(roomId))
+    REFERENCES rooms(id))
     ENGINE = InnoDB
   `;
   const [result] = await db.query(query);

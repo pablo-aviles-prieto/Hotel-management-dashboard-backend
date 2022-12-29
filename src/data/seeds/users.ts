@@ -1,5 +1,11 @@
 import { faker } from '@faker-js/faker';
+import { config } from 'dotenv';
+import { hash } from 'bcryptjs';
 import { db } from '../database';
+
+config();
+
+const { BCRYPT_SALT } = process.env;
 
 const insertUserData = async () => {
   const fakePhotos = [
@@ -12,8 +18,12 @@ const insertUserData = async () => {
   });
   const randomName = faker.name.fullName();
   const randomEmail = faker.internet.email();
+  const randomPassword = faker.internet.password();
+  const salt = BCRYPT_SALT ? +BCRYPT_SALT : 12;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const hashedPassword = await hash(randomPassword, salt);
   const randomStartDate = faker.date
-    .between('2022-01-01', '2022-12-12')
+    .between('2022-01-01', '2022-12-31')
     .toISOString()
     .substring(0, 10);
   const fakeJobPosition = ['Room service', 'Receptionist', 'Chef', 'Manager'];
@@ -49,8 +59,8 @@ const insertUserData = async () => {
   });
 
   const query = `
-    INSERT INTO users (photo, name, email, startDate, jobPosition, jobDescription, jobSchedule, contact, status)
-    VALUES ('${fakePhotos[randomNumberForPhotos]}', '${randomName}', '${randomEmail}', '${randomStartDate}', '${fakeJobPosition[randomNumberForJobPosition]}', '${fakeJobDescription[randomNumberForJobDescription]}', '${fakeJobSchedule[randomNumberForJobSchedule]}', '${randomContact}', '${fakeStatus[randomNumberForStatus]}')
+    INSERT INTO users (photo, name, email, password, startDate, jobPosition, jobDescription, jobSchedule, contact, status)
+    VALUES ('${fakePhotos[randomNumberForPhotos]}', '${randomName}', '${randomEmail}', '${hashedPassword}', '${randomStartDate}', '${fakeJobPosition[randomNumberForJobPosition]}', '${fakeJobDescription[randomNumberForJobDescription]}', '${fakeJobSchedule[randomNumberForJobSchedule]}', '${randomContact}', '${fakeStatus[randomNumberForStatus]}')
   `;
 
   const [result] = await db.query(query);

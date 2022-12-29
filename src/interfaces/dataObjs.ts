@@ -1,3 +1,5 @@
+import { RowDataPacket } from 'mysql2';
+
 export interface IContacts {
   id: number;
   date: string;
@@ -8,15 +10,20 @@ export interface IContacts {
 }
 
 export interface IUsers {
-  id: number;
+  id?: number;
   photo: string;
   name: string;
   email: string;
+  password?: string;
   startDate: string;
-  job: { position: string; description: string; schedule: string };
+  jobPosition?: string;
+  jobDescription?: string;
+  jobSchedule?: string;
   contact: string;
   status: string;
 }
+
+export interface IUsersRow extends IUsers, RowDataPacket {}
 
 export interface IRooms {
   id: number;

@@ -3,12 +3,12 @@ import { db } from '../database';
 const createContactsTable = async () => {
   const query = `
     CREATE TABLE contacts (
-    contactId INT NOT NULL AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT,
     date DATE NOT NULL,
     messageSubject VARCHAR(255) NOT NULL,
     messageBody LONGTEXT NOT NULL,
     archived TINYINT NOT NULL,
-    PRIMARY KEY (contactId))
+    PRIMARY KEY (id))
     ENGINE = InnoDB
   `;
   const [result] = await db.query(query);

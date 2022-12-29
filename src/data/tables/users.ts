@@ -3,17 +3,18 @@ import { db } from '../database';
 const createUsersTable = async () => {
   const query = `
   CREATE TABLE users (
-    userId INT NOT NULL AUTO_INCREMENT,
+    id INT NOT NULL AUTO_INCREMENT,
     photo VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
     startDate DATE NOT NULL,
     jobPosition LONGTEXT NOT NULL,
     jobDescription LONGTEXT NULL,
     jobSchedule LONGTEXT NULL,
     contact VARCHAR(255) NOT NULL,
     status VARCHAR(255) NOT NULL,
-    PRIMARY KEY (userId))
+    PRIMARY KEY (id))
   ENGINE = InnoDB
   `;
   const [result] = await db.query(query);
