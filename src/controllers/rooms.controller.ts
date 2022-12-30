@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from '../data/database';
-import { resolve } from 'path';
 import { IRoomsRow } from '../interfaces';
 import { RowDataPacket, OkPacket } from 'mysql2';
 

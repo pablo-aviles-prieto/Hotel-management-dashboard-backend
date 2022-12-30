@@ -1,11 +1,8 @@
-import * as fs from 'fs';
 import { db } from '../data/database';
 import { Request, Response, NextFunction } from 'express';
 import { resolve } from 'path';
-import { IBookings, IBookingsRow } from '../interfaces';
+import { IBookingsRow } from '../interfaces';
 import { RowDataPacket, OkPacket } from 'mysql2';
-
-const pathToJSONData = resolve(__dirname, '../assets/data/bookings.json');
 
 export const getBookingsList = async (req: Request, res: Response, next: NextFunction) => {
   const query = `
@@ -66,6 +63,9 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
 
     const parsedBooking = {
       ...getBooking[0],
+      orderDate: new Date(getBooking[0].orderDate).toISOString().substring(0, 10),
+      checkIn: new Date(getBooking[0].checkIn).toISOString().substring(0, 10),
+      checkOut: new Date(getBooking[0].checkOut).toISOString().substring(0, 10),
       roomImg: getBooking[0].photo
     };
     delete parsedBooking.photo;
