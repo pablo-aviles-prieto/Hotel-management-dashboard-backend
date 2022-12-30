@@ -26,7 +26,7 @@ const insertBookingData = async () => {
   });
   const randomRoomId = faker.datatype.number({
     min: 1,
-    max: 10
+    max: 30
   });
   const randomUserName = faker.name.fullName();
 
@@ -46,4 +46,4 @@ const insertData = (numberOfExecutes: number) => {
   });
 };
 
-void insertData(10);
+void insertData(30);
