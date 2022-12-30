@@ -48,14 +48,29 @@ const insertUserData = async () => {
     min: 0,
     max: fakeStatus.length - 1
   });
+  const fakeRoomType = [
+    'Deluxe C-661',
+    'Deluxe B-55',
+    'Deluxe A-26',
+    'Medium B-33',
+    'Medium A-53',
+    'Simple A-11',
+    'Simple A-25'
+  ];
+  const randomNumberForRoomType = faker.datatype.number({
+    min: 0,
+    max: fakeRoomType.length - 1
+  });
 
   const query = `
-    INSERT INTO rooms (photo, roomNumber, roomName, bedType, roomFloor, roomDescription, facilities, ratePerNight, status)
+    INSERT INTO rooms (photo, roomNumber, roomName, bedType, roomFloor, roomDescription, roomType, facilities, ratePerNight, status)
     VALUES ('${fakePhotos[randomNumberForPhotos]}', '${randomRoomNumber}', '${randomRoomName}', '${
     fakeBedType[randomNumberForBedType]
-  }', '${fakeRoomFloor[randomNumberForRoomFloor]}', '${randomDescription}', '${JSON.stringify(
-    fakeFacilities[randomNumberForFacilities]
-  )}', '${randomRatePerNight}', '${fakeStatus[randomNumberForStatus]}')
+  }', '${fakeRoomFloor[randomNumberForRoomFloor]}', '${randomDescription}', '${
+    fakeRoomType[randomNumberForRoomType]
+  }', '${JSON.stringify(fakeFacilities[randomNumberForFacilities])}', '${randomRatePerNight}', '${
+    fakeStatus[randomNumberForStatus]
+  }')
   `;
 
   const [result] = await db.query(query);

@@ -19,19 +19,6 @@ const insertBookingData = async () => {
     min: 0,
     max: fakeSpecialRequest.length - 1
   });
-  const fakeRoomType = [
-    'Deluxe C-661',
-    'Deluxe B-55',
-    'Deluxe A-26',
-    'Medium B-33',
-    'Medium A-53',
-    'Simple A-11',
-    'Simple A-25'
-  ];
-  const randomNumberForRoomType = faker.datatype.number({
-    min: 0,
-    max: fakeRoomType.length - 1
-  });
   const fakeStatus = ['check in', 'check out', 'in progress'];
   const randomNumberForStatus = faker.datatype.number({
     min: 0,
@@ -41,10 +28,11 @@ const insertBookingData = async () => {
     min: 1,
     max: 10
   });
+  const randomUserName = faker.name.fullName();
 
   const query = `
-    INSERT INTO bookings (bookingNumber, orderDate, checkIn, checkOut, specialRequest, roomType, status, roomId)
-    VALUES ('${randomBookingNumber}', '${randomOrderDate}', '${randomCheckIn}', '${randomCheckOut}', '${fakeSpecialRequest[randomNumberForSpecialRequest]}', '${fakeRoomType[randomNumberForRoomType]}', '${fakeStatus[randomNumberForStatus]}', '${randomRoomId}')
+    INSERT INTO bookings (bookingNumber, userName, orderDate, checkIn, checkOut, specialRequest, status, roomId)
+    VALUES ('${randomBookingNumber}', '${randomUserName}', '${randomOrderDate}', '${randomCheckIn}', '${randomCheckOut}', '${fakeSpecialRequest[randomNumberForSpecialRequest]}', '${fakeStatus[randomNumberForStatus]}', '${randomRoomId}')
   `;
 
   const [result] = await db.query(query);

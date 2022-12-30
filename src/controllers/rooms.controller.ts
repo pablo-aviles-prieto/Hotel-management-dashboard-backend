@@ -1,11 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
 import { db } from '../data/database';
 import { resolve } from 'path';
-import { IRooms, IRoomsRow } from '../interfaces';
+import { IRoomsRow } from '../interfaces';
 import { RowDataPacket, OkPacket } from 'mysql2';
-
-const pathToJSONData = resolve(__dirname, '../assets/data/rooms.json');
 
 export const getRoomsList = async (req: Request, res: Response, next: NextFunction) => {
   const query = `SELECT * FROM rooms`;

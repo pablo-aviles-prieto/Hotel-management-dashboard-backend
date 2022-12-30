@@ -10,6 +10,7 @@ const createRoomsTable = async () => {
     bedType VARCHAR(255) NOT NULL,
     roomFloor VARCHAR(255) NOT NULL,
     roomDescription LONGTEXT NOT NULL,
+    roomType VARCHAR(255) NOT NULL,
     facilities JSON NOT NULL,
     ratePerNight INT NOT NULL,
     status VARCHAR(255) NOT NULL,

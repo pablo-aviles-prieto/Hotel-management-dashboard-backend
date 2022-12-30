@@ -5,11 +5,11 @@ const createBookingsTable = async () => {
     CREATE TABLE bookings (
     id INT NOT NULL AUTO_INCREMENT,
     bookingNumber INT NOT NULL,
+    userName VARCHAR(255) NOT NULL,
     orderDate DATE NOT NULL,
     checkIn DATE NOT NULL,
     checkOut DATE NOT NULL,
     specialRequest LONGTEXT NULL,
-    roomType VARCHAR(255) NOT NULL,
     status VARCHAR(255) NOT NULL,
     roomId INT NOT NULL,
     PRIMARY KEY (id),

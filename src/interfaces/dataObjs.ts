@@ -47,13 +47,15 @@ export interface IRoomsRow extends IRooms, RowDataPacket {}
 export interface IBookings {
   id: number;
   bookingNumber: number;
-  user: { name: string; picture: string };
+  userName: string;
   orderDate: string;
   checkIn: string;
   checkOut: string;
   specialRequest: string | null;
-  roomType: string;
+  roomType?: string;
   status: string;
+  photo?: string;
+  roomImg?: string;
 }
 
 export interface IBookingsRow extends IBookings, RowDataPacket {}
