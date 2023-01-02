@@ -1,5 +1,5 @@
 export interface IContacts {
-  id: number;
+  id?: string;
   date: string;
   user: { name: string; email: string; phone: string };
   message: { subject: string; body: string };
@@ -8,7 +8,7 @@ export interface IContacts {
 }
 
 export interface IUsers {
-  id?: string | number;
+  id?: string;
   photo: string;
   name: string;
   email: string;
@@ -20,7 +20,7 @@ export interface IUsers {
 }
 
 export interface IRooms {
-  id: number;
+  id?: string;
   photo: string;
   roomNumber: string;
   roomName: string;
@@ -33,7 +33,7 @@ export interface IRooms {
 }
 
 export interface IBookings {
-  id: number;
+  id?: string;
   bookingNumber: number;
   user: { name: string; picture: string };
   orderDate: string;

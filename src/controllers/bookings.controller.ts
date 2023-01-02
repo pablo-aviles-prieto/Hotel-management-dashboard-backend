@@ -24,7 +24,7 @@ export const getSingleBooking = (req: Request, res: Response, _next: NextFunctio
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
-  const getBooking = bookingsList.find((booking) => booking.id === +bookingId);
+  const getBooking = bookingsList.find((booking) => booking.id === bookingId);
   if (!getBooking) {
     res.status(422).end();
     return;
@@ -36,7 +36,7 @@ export const editBooking = (req: Request, res: Response, _next: NextFunction) =>
   const { bookingId } = req.params;
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
-  const getBooking = bookingsList.find((booking) => booking.id === +bookingId);
+  const getBooking = bookingsList.find((booking) => booking.id === bookingId);
 
   if (!getBooking) {
     res.status(422).end();
@@ -46,7 +46,7 @@ export const editBooking = (req: Request, res: Response, _next: NextFunction) =>
   //TODO Check inputs before saving on DB
 
   const newBookingsArr = [...bookingsList];
-  const indexOfObj = newBookingsArr.findIndex((obj) => obj.id === +bookingId);
+  const indexOfObj = newBookingsArr.findIndex((obj) => obj.id === bookingId);
   newBookingsArr[indexOfObj] = {
     ...newBookingsArr[indexOfObj],
     ...req.body
@@ -60,7 +60,7 @@ export const deleteBooking = (req: Request, res: Response, _next: NextFunction) 
   const rawData = fs.readFileSync(pathToJSONData).toString();
   const bookingsList: IBookings[] = JSON.parse(rawData);
 
-  const bookingSelected = bookingsList.find((booking) => booking.id === +bookingId);
+  const bookingSelected = bookingsList.find((booking) => booking.id === bookingId);
 
   // await new Promise((resolve) => {
   //   setTimeout(() => {
