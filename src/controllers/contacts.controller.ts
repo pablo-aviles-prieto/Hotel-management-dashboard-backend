@@ -1,76 +1,75 @@
 import { Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
-import { resolve } from 'path';
-import { IContacts } from '../interfaces';
+import { ContactModel } from '../models';
 
-const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
-
-export const getContactsList = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  // console.log('req.user', req.user);
-  res.status(200).json(contactsList);
-};
-
-export const createContact = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  //TODO Check inputs before saving on DB
-  //TODO Return the created Obj
-  res.status(201).json(contactsList);
-};
-
-export const getSingleContact = (req: Request, res: Response, _next: NextFunction) => {
-  const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const getContact = contactsList.find((contact) => contact.id === +contactId);
-  if (!getContact) {
-    res.status(422).end();
-    return;
+export const getContactsList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const usersList = await ContactModel.find().exec();
+    res.status(200).json({ result: usersList });
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(getContact);
 };
 
-export const editContact = (req: Request, res: Response, _next: NextFunction) => {
-  const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const getContact = contactsList.find((contact) => contact.id === +contactId);
+export const createContact = async (req: Request, res: Response, next: NextFunction) => {
+  const { date, user, message, archived } = req.body;
 
-  if (!getContact) {
-    res.status(422).end();
-    return;
+  const contact = new ContactModel({
+    date,
+    user,
+    message,
+    archived
+  });
+
+  try {
+    const result = await contact.save();
+    res.status(201).json({ result });
+  } catch (error) {
+    next(error);
   }
-
-  //TODO Check inputs before saving on DB
-
-  const newContactsArr = [...contactsList];
-  const indexOfObj = newContactsArr.findIndex((obj) => obj.id === +contactId);
-  newContactsArr[indexOfObj] = {
-    ...newContactsArr[indexOfObj],
-    ...req.body
-  };
-
-  res.status(202).json(newContactsArr);
 };
 
-export const deleteContact = (req: Request, res: Response, _next: NextFunction) => {
+export const getSingleContact = async (req: Request, res: Response, next: NextFunction) => {
   const { contactId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const contactsList: IContacts[] = JSON.parse(rawData);
-  const contactSelected = contactsList.find((contact) => contact.id === +contactId);
 
-  // await new Promise((resolve) => {
-  //   setTimeout(() => {
-  //     resolve('');
-  //   }, 2000);
-  // });
-
-  if (!contactSelected) {
-    res.status(422).end();
-    return;
+  try {
+    const user = await ContactModel.findById(contactId).exec();
+    if (!user) return res.status(400).json({ result: 'Error fetching the contact' });
+    res.status(200).json({ result: user });
+  } catch (error) {
+    next(error);
   }
+};
 
-  res.status(204).end();
+export const editContact = async (req: Request, res: Response, next: NextFunction) => {
+  const { contactId } = req.params;
+
+  try {
+    const existContact = await ContactModel.findById(contactId).exec();
+    if (!existContact) return res.status(400).send({ result: 'Error fetching the user' });
+
+    for (const property in req.body) {
+      existContact[property] = req.body[property];
+    }
+
+    await existContact.save();
+
+    res.status(202).json({ result: existContact });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteContact = async (req: Request, res: Response, next: NextFunction) => {
+  const { contactId } = req.params;
+
+  try {
+    const existContact = await ContactModel.findById(contactId).exec();
+    if (!existContact) return res.status(400).send({ result: 'Error deleting the contact' });
+
+    await existContact.delete();
+
+    res.status(202).json({ result: 'Contact deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
 };

@@ -1,11 +1,7 @@
-import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
-import { resolve } from 'path';
 import { hashSync } from 'bcryptjs';
 import { UserModel } from '../models';
-import { IUsers } from '../interfaces';
 
-const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
 const { BCRYPT_SALT } = process.env;
 
 export const getUsersList = async (req: Request, res: Response, next: NextFunction) => {
@@ -18,7 +14,7 @@ export const getUsersList = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { photo, name, email, password, startDate, job, contact, status }: IUsers = req.body;
+  const { photo, name, email, password, startDate, job, contact, status } = req.body;
 
   const existingUserByEmail = await UserModel.findOne({ email }).exec();
   if (existingUserByEmail) return res.status(400).json({ result: 'Error creating the user' });
@@ -59,7 +55,7 @@ export const getSingleUser = async (req: Request, res: Response, next: NextFunct
 
 export const editUser = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
-  const { password }: IUsers = req.body;
+  const { password } = req.body;
 
   try {
     const existUser = await UserModel.findById(userId).exec();

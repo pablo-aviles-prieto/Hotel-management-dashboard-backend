@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { config } from 'dotenv';
 import { hash } from 'bcryptjs';
-import { UserModel } from '../../models';
 import { mongodb } from '../../loaders';
+import { UserModel } from '../../models';
 
 config();
 
@@ -56,11 +56,6 @@ const createAndInsertUserData = async () => {
     min: 0,
     max: fakeStatus.length - 1
   });
-
-  const query = `
-    INSERT INTO users (photo, name, email, password, startDate, jobPosition, jobDescription, jobSchedule, contact, status)
-    VALUES ('${fakePhotos[randomNumberForPhotos]}', '${randomName}', '${randomEmail}', '${hashedPassword}', '${randomStartDate}', '${fakeJobPosition[randomNumberForJobPosition]}', '${fakeJobDescription[randomNumberForJobDescription]}', '${fakeJobSchedule[randomNumberForJobSchedule]}', '${randomContact}', '${fakeStatus[randomNumberForStatus]}')
-  `;
 
   const user = new UserModel({
     photo: fakePhotos[randomNumberForPhotos],
