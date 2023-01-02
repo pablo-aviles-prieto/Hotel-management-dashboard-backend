@@ -8,12 +8,13 @@ export interface IContacts {
 }
 
 export interface IUsers {
-  id: number;
+  id?: string | number;
   photo: string;
   name: string;
   email: string;
-  startDate: string;
-  job: { position: string; description: string; schedule: string };
+  password: string;
+  startDate?: string;
+  job: { position?: string; description?: string; schedule?: string };
   contact: string;
   status: string;
 }
