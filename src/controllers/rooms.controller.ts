@@ -1,10 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import * as fs from 'fs';
-import { resolve } from 'path';
-import { IRooms } from '../interfaces';
 import { RoomModel } from '../models';
-
-const pathToJSONData = resolve(__dirname, '../assets/data/rooms.json');
 
 export const getRoomsList = async (req: Request, res: Response, next: NextFunction) => {
   try {

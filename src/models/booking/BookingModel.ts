@@ -21,10 +21,7 @@ const BookingSchema: Schema = new Schema({
     type: String,
     required: true
   },
-  specialRequest: {
-    type: String,
-    required: true
-  },
+  specialRequest: String,
   status: {
     type: String,
     required: true

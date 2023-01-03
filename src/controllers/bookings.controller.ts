@@ -34,7 +34,7 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
   const { bookingId } = req.params;
 
   try {
-    const booking = await BookingModel.findById(bookingId).exec();
+    const booking = await BookingModel.findById(bookingId).populate('roomId').exec();
     if (!booking) return res.status(400).json({ result: 'Error fetching the booking' });
     res.status(200).json({ result: booking });
   } catch (error) {

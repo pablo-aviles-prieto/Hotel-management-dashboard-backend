@@ -83,4 +83,4 @@ const insertData = (numberOfExecutes: number) => {
   });
 };
 
-void insertData(5);
+void insertData(30);
