@@ -4,7 +4,7 @@
   
 Hotel Miranda REST API handling the server-side logic of the hotel. Accepting petitions from the [Hotel Miranda frontend](https://github.com/Pablo-Aviles-Prieto/Hotel-management-dashboard-frontend)
 
-*The API is deployed on my Oracle server.* [https://www.miranda-back.pabloaviles.es/](https://www.miranda-back.pabloaviles.es/)
+*The API is deployed on my Oracle server.* [https://www.miranda-back.pabloaviles.es/info](https://www.miranda-back.pabloaviles.es/info)
   
 
 ## 🔧 Built With
