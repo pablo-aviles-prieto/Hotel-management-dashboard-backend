@@ -14,9 +14,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 loaders.router(app);
 loaders.createPassportInstance();
+void loaders.mongodb();
 
 app.use(errorHandler);
 
 export const httpServer = http
   .createServer(app)
-  .listen(PORT, () => console.info(`Server running and listening at http://localhost:${PORT}. Accepting petitions from ${DOMAIN}`));
+  .listen(PORT, () =>
+    console.info(`Server running and listening at http://localhost:${PORT}. Accepting petitions from ${DOMAIN}`)
+  );

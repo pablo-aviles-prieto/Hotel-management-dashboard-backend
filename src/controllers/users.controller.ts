@@ -1,70 +1,95 @@
-import * as fs from 'fs';
 import { Request, Response, NextFunction } from 'express';
-import { resolve } from 'path';
-import { IUsers } from '../interfaces';
+import { hashSync } from 'bcryptjs';
+import { UserModel } from '../models';
 
-const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
+const { BCRYPT_SALT } = process.env;
 
-export const getUsersList = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const usersList: IUsers[] = JSON.parse(rawData);
-  res.status(200).json(usersList);
-};
-
-export const createUser = (req: Request, res: Response, _next: NextFunction) => {
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const usersList: IUsers[] = JSON.parse(rawData);
-  //TODO Check inputs before saving on DB
-  //TODO Return the created Obj
-  res.status(201).json(usersList);
-};
-
-export const getSingleUser = (req: Request, res: Response, _next: NextFunction) => {
-  const { userId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const usersList: IUsers[] = JSON.parse(rawData);
-  const getUser = usersList.find((user) => user.id === +userId);
-  if (!getUser) {
-    res.status(422).end();
-    return;
+export const getUsersList = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const usersList = await UserModel.find().exec();
+    res.status(200).json({ result: usersList });
+  } catch (error) {
+    next(error);
   }
-  res.status(200).json(getUser);
 };
 
-export const editUser = (req: Request, res: Response, _next: NextFunction) => {
-  const { userId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const usersList: IUsers[] = JSON.parse(rawData);
-  const getUser = usersList.find((user) => user.id === +userId);
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { photo, name, email, password, startDate, job, contact, status } = req.body;
 
-  if (!getUser) {
-    res.status(422).end();
-    return;
+  const existingUserByEmail = await UserModel.findOne({ email }).exec();
+  if (existingUserByEmail) return res.status(400).json({ result: 'Error creating the user' });
+
+  const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
+  const hashedPassword = hashSync(password, salt);
+
+  const user = new UserModel({
+    photo,
+    name,
+    email,
+    password: hashedPassword,
+    startDate,
+    job,
+    contact,
+    status
+  });
+
+  try {
+    const result = await user.save();
+    res.status(201).json({ result });
+  } catch (error) {
+    next(error);
   }
-
-  //TODO Check inputs before saving on DB
-
-  const newBookingsArr = [...usersList];
-  const indexOfObj = newBookingsArr.findIndex((obj) => obj.id === +userId);
-  newBookingsArr[indexOfObj] = {
-    ...newBookingsArr[indexOfObj],
-    ...req.body
-  };
-
-  res.status(202).json(newBookingsArr);
 };
 
-export const deleteUser = (req: Request, res: Response, _next: NextFunction) => {
+export const getSingleUser = async (req: Request, res: Response, next: NextFunction) => {
   const { userId } = req.params;
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  const usersList: IUsers[] = JSON.parse(rawData);
 
-  const userSelected = usersList.find((user) => user.id === +userId);
-
-  if (!userSelected) {
-    res.status(422).end();
-    return;
+  try {
+    const user = await UserModel.findById(userId).exec();
+    if (!user) return res.status(400).json({ result: 'Error fetching the user' });
+    res.status(200).json({ result: user });
+  } catch (error) {
+    next(error);
   }
+};
 
-  res.status(204).end();
+export const editUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+  const { password } = req.body;
+
+  try {
+    const existUser = await UserModel.findById(userId).exec();
+    if (!existUser) return res.status(400).send({ result: 'Error fetching the user' });
+
+    for (const property in req.body) {
+      if (property === 'password') {
+        if (!password) continue;
+        const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
+        const hashedPassword = hashSync(password, salt);
+        existUser.password = hashedPassword;
+        continue;
+      }
+      existUser[property] = req.body[property];
+    }
+    await existUser.save();
+
+    res.status(202).json({ result: existUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId } = req.params;
+
+  try {
+    const existUser = await UserModel.findById(userId).exec();
+    if (!existUser) return res.status(400).send({ result: 'Error deleting the user' });
+
+    await existUser.delete();
+
+    res.status(202).json({ result: 'User deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
 };
