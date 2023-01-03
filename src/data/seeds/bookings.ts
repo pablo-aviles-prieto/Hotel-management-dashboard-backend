@@ -32,10 +32,10 @@ const insertBookingData = async () => {
     max: fakeStatus.length - 1
   });
   const allRooms = await RoomModel.find().select({ _id: 1 }).exec();
-  const parsedAllRooms = allRooms.map((room) => JSON.stringify(room._id).replace(/"/g, ''));
+  const parsedRooms = allRooms.map((room) => room._id);
   const randomRoomId = faker.datatype.number({
     min: 0,
-    max: parsedAllRooms.length - 1
+    max: parsedRooms.length - 1
   });
   const randomUserName = faker.name.fullName();
 
@@ -47,7 +47,7 @@ const insertBookingData = async () => {
     checkOut: randomCheckOut,
     specialRequest: fakeSpecialRequest[randomNumberForSpecialRequest],
     status: fakeStatus[randomNumberForStatus],
-    roomId: parsedAllRooms[randomRoomId]
+    roomId: parsedRooms[randomRoomId]
   });
 
   const result = await booking.save();

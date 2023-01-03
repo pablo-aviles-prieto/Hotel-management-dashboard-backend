@@ -30,7 +30,8 @@ const BookingSchema: Schema = new Schema({
     required: true
   },
   roomId: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'rooms',
     required: true
   }
 });
