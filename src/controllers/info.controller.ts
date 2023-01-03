@@ -4,13 +4,6 @@ export const showRoutesInfo = (req: Request, res: Response, _next: NextFunction)
   const routesInfo = `
   <h2>Hotel Miranda endpoints, by Pablo Avilés</h2>
   <div>
-  </div>
-    <p><strong>Auth</strong> routes:</p>
-    <ul>
-      <li>/login POST <i>(public)</i></li>
-      <li>/register POST <i>(public-dev)</i></li>
-    </ul>
-  <div>
     <p><strong>Bookings</strong> routes:</p>
     <ul>
       <li>/bookings GET</li>
