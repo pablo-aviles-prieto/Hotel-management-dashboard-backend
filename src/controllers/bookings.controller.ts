@@ -3,7 +3,7 @@ import { BookingModel } from '../models';
 
 export const getBookingsList = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const bookingsList = await BookingModel.find().populate('roomId').exec();
+    const bookingsList = await BookingModel.find().populate('roomId');
     res.status(200).json({ result: bookingsList });
   } catch (error) {
     next(error);

@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker';
 import { mongodb } from '../../loaders';
 import { config } from 'dotenv';
 import { BookingModel, RoomModel } from '../../models';
-import { IRooms } from '../../interfaces';
 
 config();
 

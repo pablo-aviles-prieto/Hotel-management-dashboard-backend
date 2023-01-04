@@ -15,7 +15,7 @@
     "test": "jest --config jest.json --runInBand",
     "test:watch": "jest --watch --config jest.json",
     "test:coverage": "jest --config jest.json --collectCoverage && codecov",
-    "test:openhandles": "jest --detectOpenHandles"
+    "test:openhandles": "jest --config jest.json --runInBand --detectOpenHandles"
   },
   "keywords": [],
   "author": "",

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { httpServer } from '../app';
 
@@ -9,8 +10,6 @@ describe('Auth endpoints', () => {
       .set('Content-Type', 'application/json')
       .expect(200)
       .expect('Content-Type', /json/);
-
-    console.log('res.body', res.body);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
@@ -41,6 +40,7 @@ describe('Auth endpoints', () => {
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await mongoose.disconnect();
   httpServer.close();
 });

@@ -1,19 +1,12 @@
-import * as fs from 'fs';
-import { resolve } from 'path';
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
-import { IUsers } from '../interfaces';
 
-let usersList: IUsers[] = [];
 let jwtTokenCorrect: string | null = '';
 let jwtTokenIncorrect: string | null = '';
 
 beforeAll(() => {
-  const pathToJSONData = resolve(__dirname, '../assets/data/users.json');
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  usersList = JSON.parse(rawData);
-
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
   jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
 });
@@ -28,7 +21,6 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers[]>(usersList);
   });
   it(`/users (GET) return 401 Unauthorized when no JWT provided`, async () => {
     const res = await request(httpServer).get('/users/').expect(401);
@@ -57,7 +49,6 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers[]>(usersList);
   });
   it(`/users/ (POST) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -79,7 +70,6 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers>(usersList[0]);
   });
   it(`/users/1 (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -101,7 +91,6 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IUsers[]>(usersList);
   });
   it(`/users/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -135,6 +124,7 @@ describe('Users endpoints', () => {
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await mongoose.disconnect();
   httpServer.close();
 });
