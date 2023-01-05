@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { RoomModel } from '../models';
+import { RoomModel, BookingModel } from '../models';
 
 export const getRoomsList = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -90,13 +90,13 @@ export const deleteRoom = async (req: Request, res: Response, next: NextFunction
   const { roomId } = req.params;
 
   try {
-    // TODO check if this room is booked and handle it
     const existRoom = await RoomModel.findById(roomId).exec();
     if (!existRoom) return res.status(400).send({ result: 'Error deleting the room' });
 
+    await BookingModel.deleteMany({ roomId: existRoom.id });
     await existRoom.delete();
 
-    res.status(202).json({ result: 'Room deleted successfully' });
+    res.status(202).json({ result: 'Room and the bookings associated were deleted successfully' });
   } catch (error) {
     next(error);
   }
