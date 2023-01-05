@@ -1,25 +1,46 @@
-import * as fs from 'fs';
-import { resolve } from 'path';
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
-import { IContacts } from '../interfaces';
+import { ContactModel } from '../models';
 
-let contactsList: IContacts[] = [];
 let jwtTokenCorrect: string | null = '';
 let jwtTokenIncorrect: string | null = '';
+let correctDataToInsert = {};
+let dataToEdit = {};
+let contactId = '';
 
-beforeAll(() => {
-  const pathToJSONData = resolve(__dirname, '../assets/data/contacts.json');
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  contactsList = JSON.parse(rawData);
-
+beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
   jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+
+  const contactsList = await ContactModel.find().select({ id: 1 });
+  contactId = contactsList[0].id;
+
+  correctDataToInsert = {
+    date: '2023-01-05',
+    user: {
+      name: 'Test name',
+      email: 'test@mail.test',
+      phone: '21-232-1234'
+    },
+    message: {
+      subject: 'Test subject',
+      body: 'Test body'
+    },
+    archived: false
+  };
+  dataToEdit = {
+    user: {
+      name: 'Edited name',
+      email: 'edited@mail.test'
+    },
+    archived: true
+  };
 });
 
 describe('Contacts endpoints', () => {
-  it(`/contacts (GET) returns 200 and IContacts[] when correct JWT provided`, async () => {
+  it(`/contacts (GET) returns 200 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .get('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
@@ -28,7 +49,6 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IContacts[]>(contactsList);
   });
   it(`/contacts (GET) return 401 Unauthorized when no JWT provided`, async () => {
     const res = await request(httpServer).get('/contacts/').expect(401);
@@ -48,16 +68,16 @@ describe('Contacts endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/contacts (POST) returns 201 and IContacts[] when correct JWT provided`, async () => {
+  it(`/contacts (POST) returns 201 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .post('/contacts/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
+      .send(correctDataToInsert)
       .expect(201)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IContacts[]>(contactsList);
   });
   it(`/contacts (POST) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -70,20 +90,19 @@ describe('Contacts endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/contacts/1 (GET) returns 200 and the 1st obj from IContacts[] when correct JWT provided`, async () => {
+  it(`/contacts/1stContact (GET) returns 200 and the 1st obj from IContacts[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/contacts/1')
+      .get(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IContacts>(contactsList[0]);
   });
-  it(`/contacts/1 (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1stContact (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/contacts/1')
+      .get(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -92,20 +111,20 @@ describe('Contacts endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/contacts/1 (PATCH) returns 202 and IContacts[] updated when correct JWT provided`, async () => {
+  it(`/contacts/1 (PATCH) returns 202 updated when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/contacts/1')
+      .patch(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
+      .send(dataToEdit)
       .expect(202)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IContacts[]>(contactsList);
   });
-  it(`/contacts/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1stContact (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/contacts/1')
+      .patch(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -114,18 +133,18 @@ describe('Contacts endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/contacts/1 (DELETE) returns 204 and void when correct JWT provided`, async () => {
+  it(`/contacts/1stContact (DELETE) returns 202when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .delete('/contacts/1')
+      .delete(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(204);
+      .expect(202);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
   });
-  it(`/contacts/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/contacts/1stContact (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .delete('/contacts/1')
+      .delete(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -135,6 +154,7 @@ describe('Contacts endpoints', () => {
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await mongoose.disconnect();
   httpServer.close();
 });

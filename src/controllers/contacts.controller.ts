@@ -48,6 +48,22 @@ export const editContact = async (req: Request, res: Response, next: NextFunctio
     if (!existContact) return res.status(400).send({ result: 'Error fetching the user' });
 
     for (const property in req.body) {
+      if (property === 'user') {
+        const newUserProps = {
+          ...existContact.user,
+          ...req.body.user
+        };
+        existContact.user = newUserProps;
+        continue;
+      }
+      if (property === 'message') {
+        const newMessageProps = {
+          ...existContact.message,
+          ...req.body.message
+        };
+        existContact.message = newMessageProps;
+        continue;
+      }
       existContact[property] = req.body[property];
     }
 

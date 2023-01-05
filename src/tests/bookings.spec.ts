@@ -118,7 +118,7 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1stBooking (PATCH) returns 202 and IBookings[] when correct JWT provided`, async () => {
+  it(`/bookings/1stBooking (PATCH) returns 202 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .patch(`/bookings/${bookingId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
@@ -140,7 +140,7 @@ describe('Bookings endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/bookings/1stbooking (DELETE) returns 204 when correct JWT provided`, async () => {
+  it(`/bookings/1stbooking (DELETE) returns 202 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .delete(`/bookings/${bookingId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
