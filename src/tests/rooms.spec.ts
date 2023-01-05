@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
 import { RoomModel } from '../models';
@@ -17,22 +18,78 @@ beforeAll(async () => {
   const roomsList = await RoomModel.find().select({ id: 1 });
   roomId = roomsList[0].id;
 
+  const fakePhotos = [
+    'https://pablo-aviles-prieto.github.io/hotel-management-app/assets/hotel-rooms/room1.jpg',
+    'https://pablo-aviles-prieto.github.io/hotel-management-app/assets/hotel-rooms/room2.jpg',
+    'https://pablo-aviles-prieto.github.io/hotel-management-app/assets/hotel-rooms/room3.jpg'
+  ];
+  const randomNumberForPhotos = faker.datatype.number({
+    min: 0,
+    max: fakePhotos.length - 1
+  });
+  const fakeBedType = ['Double superior', 'Single bed', 'Double bed'];
+  const randomNumberForBedType = faker.datatype.number({
+    min: 0,
+    max: fakeBedType.length - 1
+  });
+  const fakeRoomFloor = ['A-1', 'B-3', 'B-2', 'B-1', 'A-2', 'A-3'];
+  const randomNumberForRoomFloor = faker.datatype.number({
+    min: 0,
+    max: fakeRoomFloor.length - 1
+  });
+  const fakeFacilities = [
+    ['Shower', 'LED TV', 'Coffee Set', 'Towel'],
+    ['Shower', 'Double Bed', 'Wifi', 'Coffee Set'],
+    ['LED TV', 'Bath', 'AC', 'Wifi'],
+    ['AC', 'LED TV', 'Towel', 'Bath'],
+    ['AC', 'Shower', 'Towel', 'Wifi'],
+    ['Double Bed', 'LED TV', 'Towel', 'Coffee Set']
+  ];
+  const randomNumberForFacilities = faker.datatype.number({
+    min: 0,
+    max: fakeFacilities.length - 1
+  });
+  const fakeRoomType = [
+    'Deluxe C-661',
+    'Deluxe B-55',
+    'Deluxe A-26',
+    'Medium B-33',
+    'Medium A-53',
+    'Simple A-11',
+    'Simple A-25'
+  ];
+  const randomNumberForRoomType = faker.datatype.number({
+    min: 0,
+    max: fakeRoomType.length - 1
+  });
+  const fakeStatus = ['Booked', 'Available'];
+  const randomNumberForStatus = faker.datatype.number({
+    min: 0,
+    max: fakeStatus.length - 1
+  });
+
   correctDataToInsert = {
-    images: 'photo test',
-    roomNumber: 912,
-    roomName: 'test name',
-    bedType: 'test suite',
-    roomFloor: 'test floor',
+    images: fakePhotos[randomNumberForPhotos],
+    roomNumber: faker.datatype.number({
+      min: 0,
+      max: 9999
+    }),
+    roomName: faker.animal.fish(),
+    bedType: fakeBedType[randomNumberForBedType],
+    roomFloor: fakeRoomFloor[randomNumberForRoomFloor],
     roomDescription: 'test description',
-    roomType: 'test type',
-    facilites: ['test1', 'test2'],
-    ratePerNight: 99,
-    status: 'test status'
+    roomType: fakeRoomType[randomNumberForRoomType],
+    facilites: fakeFacilities[randomNumberForFacilities],
+    ratePerNight: faker.datatype.number({
+      min: 199,
+      max: 599
+    }),
+    status: fakeStatus[randomNumberForStatus]
   };
   dataToEdit = {
-    roomFloor: 'edited floor',
+    roomFloor: fakeRoomFloor[randomNumberForRoomFloor],
     roomDescription: 'edited description',
-    roomType: 'edited type'
+    roomType: fakeRoomType[randomNumberForRoomType]
   };
 });
 

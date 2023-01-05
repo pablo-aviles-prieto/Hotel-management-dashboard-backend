@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
 import { RoomModel, BookingModel } from '../models';
@@ -20,22 +21,26 @@ beforeAll(async () => {
   bookingId = bookingsList[0].id;
   roomId = roomsList[roomsList.length - 1].id;
 
-  console.log('roomId', roomId);
-  console.log('roomsList[0].id', roomsList[0].id);
+  const randomDates = faker.date.betweens('2022-01-01', '2022-12-12', 3);
+  const fakeStatus = ['check in', 'check out', 'in progress'];
+  const randomNumberForStatus = faker.datatype.number({
+    min: 0,
+    max: fakeStatus.length - 1
+  });
 
   correctDataToInsert = {
-    bookingNumber: 8181,
-    userName: 'Test name',
-    orderDate: '2022-05-05',
-    checkIn: '2022-07-25',
-    checkOut: '2022-07-30',
-    status: 'Test status',
+    bookingNumber: faker.datatype.number({ min: 1, max: 99999 }),
+    userName: faker.name.fullName(),
+    orderDate: randomDates[0].toISOString().substring(0, 10),
+    checkIn: randomDates[1].toISOString().substring(0, 10),
+    checkOut: randomDates[2].toISOString().substring(0, 10),
+    status: fakeStatus[randomNumberForStatus],
     roomId
   };
   dataToEdit = {
-    bookingNumber: 92,
-    userName: 'Edited test name',
-    status: 'Modified'
+    bookingNumber: faker.datatype.number({ min: 1, max: 99999 }),
+    userName: faker.name.fullName(),
+    status: fakeStatus[randomNumberForStatus]
   };
 });
 

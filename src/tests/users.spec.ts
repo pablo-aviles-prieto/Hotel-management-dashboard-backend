@@ -18,26 +18,55 @@ beforeAll(async () => {
   const usersList = await UserModel.find().select({ id: 1 });
   userId = usersList[0].id;
 
+  const fakePhotos = [
+    'https://www.interstatedevelopment.com/wp-content/uploads/2019/04/generic-avatar-1.jpg',
+    'https://www.pngkey.com/png/detail/308-3081138_contact-avatar-generic.png'
+  ];
+  const randomNumberForPhotos = faker.datatype.number({
+    min: 0,
+    max: fakePhotos.length - 1
+  });
+  const fakeJobPosition = ['Room service', 'Receptionist', 'Chef', 'Manager'];
+  const randomNumberForJobPosition = faker.datatype.number({
+    min: 0,
+    max: fakeJobPosition.length - 1
+  });
+  const fakeJobDescription = [
+    'Anticipate guests needs in order to accommodate them and provide an exceptional guest experience',
+    'Answering guest inquiries. Directing phone calls. Coordinating travel plans',
+    'Offer restaurant and activity recommendations and assist guests in arranging transportation',
+    'Act as a liaison between guests and any department necessary including the kitchen. Housekeeping'
+  ];
+  const randomNumberForJobDescription = faker.datatype.number({
+    min: 0,
+    max: fakeJobDescription.length - 1
+  });
+  const fakeStatus = ['Active', 'Inactive'];
+  const randomNumberForStatus = faker.datatype.number({
+    min: 0,
+    max: fakeStatus.length - 1
+  });
+
   correctDataToInsert = {
-    photo: 'photo test',
-    name: 'test name',
+    photo: fakePhotos[randomNumberForPhotos],
+    name: faker.name.fullName(),
     email: faker.internet.email(),
-    password: 'testPassword',
-    startDate: '2023-05-01',
+    password: faker.internet.password(),
+    startDate: new Date().toISOString().substring(0, 10),
     job: {
-      position: 'test position job',
-      description: 'test description job',
+      position: fakeJobPosition[randomNumberForJobPosition],
+      description: fakeJobDescription[randomNumberForJobDescription],
       schedule: 'test schedule job'
     },
-    contact: 'test contact',
-    status: 'test status'
+    contact: faker.phone.number('9##-###-###'),
+    status: fakeStatus[randomNumberForStatus]
   };
   dataToEdit = {
-    email: 'edited@email.test',
-    password: 'editedPassword',
+    email: faker.internet.email(),
+    password: faker.internet.password(),
     job: {
-      position: 'edited position job',
-      description: 'edited description job'
+      position: fakeJobPosition[randomNumberForJobPosition],
+      description: fakeJobDescription[randomNumberForJobDescription]
     }
   };
 });

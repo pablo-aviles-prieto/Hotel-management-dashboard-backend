@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
 import { ContactModel } from '../models';
@@ -17,25 +18,45 @@ beforeAll(async () => {
   const contactsList = await ContactModel.find().select({ id: 1 });
   contactId = contactsList[0].id;
 
+  const fakeMessageSubject = ['Best memories', 'Unhappy stay', 'Best place', 'A bit weird', 'Amazing views'];
+  const randomNumberForMessageSubject = faker.datatype.number({
+    min: 0,
+    max: fakeMessageSubject.length - 1
+  });
+  const fakeMessageBody = [
+    'It was a good place to crash out',
+    'Im surprised with all the surroundings',
+    'I could say a few things to improve, but overall was a good place to chill out',
+    `Couldnt say anything bad about it`,
+    'Happiest place ever',
+    'I would disagree with some previous recommendations',
+    'Simple the best hotel ever',
+    'The best place Ive ever seen'
+  ];
+  const randomNumberForMessageBody = faker.datatype.number({
+    min: 0,
+    max: fakeMessageBody.length - 1
+  });
+
   correctDataToInsert = {
-    date: '2023-01-05',
+    date: faker.date.between('2022-01-01', '2022-12-12').toISOString().substring(0, 10),
     user: {
-      name: 'Test name',
-      email: 'test@mail.test',
-      phone: '21-232-1234'
+      name: faker.name.fullName(),
+      email: faker.internet.email(),
+      phone: faker.phone.number('9##-###-###')
     },
     message: {
-      subject: 'Test subject',
-      body: 'Test body'
+      subject: fakeMessageSubject[randomNumberForMessageSubject],
+      body: fakeMessageBody[randomNumberForMessageBody]
     },
-    archived: false
+    archived: faker.datatype.boolean()
   };
   dataToEdit = {
     user: {
-      name: 'Edited name',
-      email: 'edited@mail.test'
+      name: faker.name.fullName(),
+      email: faker.internet.email()
     },
-    archived: true
+    archived: faker.datatype.boolean()
   };
 });
 
