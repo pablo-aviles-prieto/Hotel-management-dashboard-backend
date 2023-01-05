@@ -133,7 +133,7 @@ describe('Contacts endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/contacts/1stContact (DELETE) returns 202when correct JWT provided`, async () => {
+  it(`/contacts/1stContact (DELETE) returns 202 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .delete(`/contacts/${contactId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)

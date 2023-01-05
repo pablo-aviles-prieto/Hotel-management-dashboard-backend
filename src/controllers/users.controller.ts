@@ -62,8 +62,16 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
     if (!existUser) return res.status(400).send({ result: 'Error fetching the user' });
 
     for (const property in req.body) {
+      if (property === 'job') {
+        const newJobProps = {
+          ...existUser.job,
+          ...req.body.job
+        };
+        existUser.job = newJobProps;
+        continue;
+      }
       if (property === 'password') {
-        if (!password) continue;
+        if (!password) continue; // password can be null
         const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
         const hashedPassword = hashSync(password, salt);
         existUser.password = hashedPassword;

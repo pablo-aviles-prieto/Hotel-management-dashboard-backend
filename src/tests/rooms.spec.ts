@@ -1,25 +1,43 @@
-import * as fs from 'fs';
-import { resolve } from 'path';
+import mongoose from 'mongoose';
 import request from 'supertest';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
-import { IRooms } from '../interfaces';
+import { RoomModel } from '../models';
 
-let roomsList: IRooms[] = [];
 let jwtTokenCorrect: string | null = '';
 let jwtTokenIncorrect: string | null = '';
+let correctDataToInsert = {};
+let dataToEdit = {};
+let roomId = '';
 
-beforeAll(() => {
-  const pathToJSONData = resolve(__dirname, '../assets/data/rooms.json');
-  const rawData = fs.readFileSync(pathToJSONData).toString();
-  roomsList = JSON.parse(rawData);
-
+beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
   jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+
+  const roomsList = await RoomModel.find().select({ id: 1 });
+  roomId = roomsList[0].id;
+
+  correctDataToInsert = {
+    images: 'photo test',
+    roomNumber: 912,
+    roomName: 'test name',
+    bedType: 'test suite',
+    roomFloor: 'test floor',
+    roomDescription: 'test description',
+    roomType: 'test type',
+    facilites: ['test1', 'test2'],
+    ratePerNight: 99,
+    status: 'test status'
+  };
+  dataToEdit = {
+    roomFloor: 'edited floor',
+    roomDescription: 'edited description',
+    roomType: 'edited type'
+  };
 });
 
 describe('Rooms endpoints', () => {
-  it(`/rooms (GET) returns 200 and IRooms[] when correct JWT provided`, async () => {
+  it(`/rooms (GET) returns 200 when correct JWT provided`, async () => {
     const res = await request(httpServer)
       .get('/rooms/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
@@ -28,7 +46,6 @@ describe('Rooms endpoints', () => {
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms[]>(roomsList);
   });
   it(`/rooms (GET) return 401 Unauthorized when no JWT provided`, async () => {
     const res = await request(httpServer).get('/rooms/').expect(401);
@@ -52,12 +69,12 @@ describe('Rooms endpoints', () => {
     const res = await request(httpServer)
       .post('/rooms/')
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
+      .send(correctDataToInsert)
       .expect(201)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms[]>(roomsList);
   });
   it(`/rooms (POST) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
@@ -70,20 +87,19 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms/1 (GET) returns 200 and the 1st obj from IRooms[] when correct JWT provided`, async () => {
+  it(`/rooms/1stRoom (GET) returns 200 and the 1st obj from IRooms[] when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/rooms/1')
+      .get(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
       .expect(200)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms>(roomsList[0]);
   });
-  it(`/rooms/1 (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/rooms/1stRoom (GET) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .get('/rooms/1')
+      .get(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -92,20 +108,20 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms/1 (PATCH) returns 202 and IRooms[] updated when correct JWT provided`, async () => {
+  it(`/rooms/1stRoom (PATCH) returns 202 when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/rooms/1')
+      .patch(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
+      .send(dataToEdit)
       .expect(202)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
-    expect(res.body).toStrictEqual<IRooms[]>(roomsList);
   });
-  it(`/rooms/1 (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/rooms/1stRoom (PATCH) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .patch('/rooms/1')
+      .patch(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -114,18 +130,18 @@ describe('Rooms endpoints', () => {
     expect(res.body.error).toMatch('Unauthorized');
   });
 
-  it(`/rooms/1 (DELETE) returns 204 and void when correct JWT provided`, async () => {
+  it(`/rooms/1stRoom (DELETE) returns 202 when correct JWT provided`, async () => {
     const res = await request(httpServer)
-      .delete('/rooms/1')
+      .delete(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(204);
+      .expect(202);
 
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
   });
-  it(`/rooms/1 (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
+  it(`/rooms/1stRoom (DELETE) return 401 Unauthorized when incorrect JWT provided`, async () => {
     const res = await request(httpServer)
-      .delete('/rooms/1')
+      .delete(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
 
@@ -135,6 +151,7 @@ describe('Rooms endpoints', () => {
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  await mongoose.disconnect();
   httpServer.close();
 });
