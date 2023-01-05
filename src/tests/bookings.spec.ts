@@ -15,10 +15,13 @@ beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
   jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
 
-  const roomsList = await RoomModel.find().select({ id: 1 });
   const bookingsList = await BookingModel.find().select({ id: 1 });
+  const roomsList = await RoomModel.find().select({ id: 1 });
   bookingId = bookingsList[0].id;
-  roomId = roomsList[0].id;
+  roomId = roomsList[roomsList.length - 1].id;
+
+  console.log('roomId', roomId);
+  console.log('roomsList[0].id', roomsList[0].id);
 
   correctDataToInsert = {
     bookingNumber: 8181,

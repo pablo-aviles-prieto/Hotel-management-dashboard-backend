@@ -90,6 +90,7 @@ export const deleteRoom = async (req: Request, res: Response, next: NextFunction
   const { roomId } = req.params;
 
   try {
+    // TODO check if this room is booked and handle it
     const existRoom = await RoomModel.findById(roomId).exec();
     if (!existRoom) return res.status(400).send({ result: 'Error deleting the room' });
 

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import request from 'supertest';
+import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
 import { jwtTokenGenerator } from '../utils';
 import { UserModel } from '../models';
@@ -20,7 +21,7 @@ beforeAll(async () => {
   correctDataToInsert = {
     photo: 'photo test',
     name: 'test name',
-    email: 'test@email.test',
+    email: faker.internet.email(),
     password: 'testPassword',
     startDate: '2023-05-01',
     job: {
