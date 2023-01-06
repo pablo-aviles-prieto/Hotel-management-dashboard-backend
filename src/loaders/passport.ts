@@ -11,7 +11,6 @@ export const createPassportInstance = () => {
         secretOrKey: JWT_PRIVATE
       },
       (jwt_payload, done) => {
-        if (jwt_payload.email !== 'test@test.com') return done({ message: 'Unauthorized' }, false);
         done(null, { id: jwt_payload.id, email: jwt_payload.email });
       }
     )

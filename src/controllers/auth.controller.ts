@@ -1,20 +1,31 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtTokenGenerator } from '../utils';
+import { UserModel } from '../models';
+import { compare } from 'bcryptjs';
 
-export const createNewUser = (req: Request, res: Response, _next: NextFunction) => {
-  const { email } = req.body;
-  // TODO if user exists
-  const token = jwtTokenGenerator({ id: 0, email });
+export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
 
-  res.status(200).json({ token });
-};
+  const userExist = await UserModel.findOne({ email }).exec();
+  if (!userExist) {
+    res.status(401).json({ error: 'Check the credentials and try again!' });
+    return;
+  }
 
-export const loginUser = (req: Request, res: Response, _next: NextFunction) => {
-  const { email } = req.body;
-  // TODO if email matches
-  // TODO if hashed password matches
-  if (email !== 'test@test.com') return res.status(401).send('Not my hardcoded user');
+  let passwordMatches = null;
+  // Gotta try/catch the brypt.compare method since it can crash the app when the password supplied is !== string. (mongoose already handles the error so no need to try/catch it)
+  try {
+    passwordMatches = await compare(password, userExist?.password);
+  } catch (error) {
+    res.status(401).json({ error: 'Check the credentials and try again!' });
+    return;
+  }
 
-  const token = jwtTokenGenerator({ id: 0, email });
-  res.status(200).json({ token });
+  if (!passwordMatches) {
+    res.status(401).json({ error: 'Check the credentials and try again!' });
+    return;
+  }
+  const parsedUserId = JSON.stringify(userExist._id);
+  const token = jwtTokenGenerator({ id: parsedUserId, email });
+  res.status(200).json({ token, user: userExist });
 };
