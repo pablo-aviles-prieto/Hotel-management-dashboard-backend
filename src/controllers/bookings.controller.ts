@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
 import { Request, Response, NextFunction } from 'express';
 import { BookingModel } from '../models';
+import { BaseError } from '../errors/ErrorClass';
 
 export const getBookingsList = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -45,21 +47,21 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
 export const editBooking = async (req: Request, res: Response, next: NextFunction) => {
   const { bookingId } = req.params;
 
+  const sanitizeDate = (date: string) => new Date(date).toISOString().substring(0, 10);
+
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
     if (!existBooking) return res.status(400).send({ result: 'Error fetching the user' });
 
+    const sanitizeBookingProps: { [key: string]: Function } = {
+      orderDate: (date: string) => sanitizeDate(date),
+      checkIn: (date: string) => sanitizeDate(date),
+      checkOut: (date: string) => sanitizeDate(date)
+    };
+
     for (const property in req.body) {
-      if (property === 'orderDate') {
-        existBooking.orderDate = new Date(req.body.orderDate).toISOString().substring(0, 10);
-        continue;
-      }
-      if (property === 'checkIn') {
-        existBooking.checkIn = new Date(req.body.checkIn).toISOString().substring(0, 10);
-        continue;
-      }
-      if (property === 'checkOut') {
-        existBooking.checkOut = new Date(req.body.checkOut).toISOString().substring(0, 10);
+      if (sanitizeBookingProps[property]) {
+        existBooking[property] = sanitizeBookingProps[property](req.body[property]);
         continue;
       }
       existBooking[property] = req.body[property];
@@ -78,12 +80,16 @@ export const deleteBooking = async (req: Request, res: Response, next: NextFunct
 
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
-    if (!existBooking) return res.status(400).send({ result: 'Error deleting the booking' });
+    if (!existBooking) return next(new BaseError({ message: 'The booking does not exist', status: 400 }));
 
     await existBooking.delete();
 
     res.status(202).json({ result: 'Booking deleted successfully' });
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error) {
+      next(new BaseError({ message: 'Error deleting bookings', status: 400, additionalMessage: error.message }));
+      return;
+    }
+    next(new BaseError({ message: 'Generic error deleting booking', status: 500 }));
   }
 };
