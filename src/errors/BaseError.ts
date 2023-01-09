@@ -1,13 +1,8 @@
-interface IBaseError {
-  message?: string;
-  status?: number;
-  additionalMessage?: string;
-}
+import { IBaseError } from '../interfaces';
 
 export class BaseError extends Error {
   status: number;
-  additionalMessage: string;
-  message: string;
+  additionalMessage: string | unknown;
   constructor({ message, status, additionalMessage }: IBaseError) {
     super();
 
