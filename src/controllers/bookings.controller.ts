@@ -62,14 +62,16 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
 
   try {
     const booking = await BookingModel.findById(bookingId).populate('roomId').exec();
-    if (!booking)
-      return next(
+    if (!booking) {
+      next(
         new ControllerError({
           name: 'Error single booking',
           message: `Couldn't find the selected booking`,
           status: 404
         })
       );
+      return;
+    }
     res.status(200).json({ result: booking });
   } catch (error) {
     if (error instanceof mongoose.Error) {
@@ -92,14 +94,16 @@ export const editBooking = async (req: Request, res: Response, next: NextFunctio
 
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
-    if (!existBooking)
-      return next(
+    if (!existBooking) {
+      next(
         new ControllerError({
           name: 'Error editing booking',
           message: `Couldn't find the selected booking`,
           status: 404
         })
       );
+      return;
+    }
 
     const sanitizeBookingProps: { [key: string]: Function } = {
       orderDate: (date: string) => sanitizeDate(date),
@@ -139,14 +143,16 @@ export const deleteBooking = async (req: Request, res: Response, next: NextFunct
 
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
-    if (!existBooking)
-      return next(
+    if (!existBooking) {
+      next(
         new ControllerError({
           name: 'Error deleting booking',
           message: `Couldn't find the selected booking`,
           status: 400
         })
       );
+      return;
+    }
 
     await existBooking.delete();
 
