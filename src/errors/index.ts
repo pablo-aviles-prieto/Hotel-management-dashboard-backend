@@ -1,3 +1,3 @@
 export { BaseError } from './BaseError';
 export { AuthError } from './AuthError';
-export { BookingError } from './BookingError';
+export { ControllerError } from './ControllerError';
