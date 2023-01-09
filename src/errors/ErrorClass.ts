@@ -7,6 +7,7 @@ interface IBaseError {
 export class BaseError extends Error {
   status: number;
   additionalMessage: string;
+  message: string;
   constructor({ message, status, additionalMessage }: IBaseError) {
     super();
 
