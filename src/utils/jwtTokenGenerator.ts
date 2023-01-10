@@ -7,7 +7,7 @@ export interface IJWTUser {
 
 const { JWT_PRIVATE } = process.env;
 
-export const jwtTokenGenerator = (user: IJWTUser): (string | null) => {
+export const jwtTokenGenerator = (user: IJWTUser): string | null => {
   return JWT_PRIVATE
     ? sign(
         {
@@ -15,6 +15,18 @@ export const jwtTokenGenerator = (user: IJWTUser): (string | null) => {
           email: user.email
         },
         JWT_PRIVATE
+      )
+    : null;
+};
+
+export const incorrectJWTTokenGenerator = (user: IJWTUser): string | null => {
+  return JWT_PRIVATE
+    ? sign(
+        {
+          id: user.id,
+          email: user.email
+        },
+        'string for test purpose'
       )
     : null;
 };

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
-import { jwtTokenGenerator } from '../utils';
+import { incorrectJWTTokenGenerator, jwtTokenGenerator } from '../utils';
 import { ContactModel } from '../models';
 
 let jwtTokenCorrect: string | null = '';
@@ -13,10 +13,10 @@ let contactId = '';
 
 beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
-  jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+  jwtTokenIncorrect = incorrectJWTTokenGenerator({ id: 0, email: 'test1@test.com' });
 
   const contactsList = await ContactModel.find().select({ id: 1 });
-  contactId = contactsList[0].id;
+  contactId = contactsList[contactsList.length - 1].id;
 
   const fakeMessageSubject = ['Best memories', 'Unhappy stay', 'Best place', 'A bit weird', 'Amazing views'];
   const randomNumberForMessageSubject = faker.datatype.number({
@@ -86,7 +86,7 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/contacts (POST) returns 201 when correct JWT provided`, async () => {
@@ -108,7 +108,7 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/contacts/1stContact (GET) returns 200 and the 1st obj from IContacts[] when correct JWT provided`, async () => {
@@ -129,7 +129,7 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/contacts/1 (PATCH) returns 202 updated when correct JWT provided`, async () => {
@@ -151,7 +151,7 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/contacts/1stContact (DELETE) returns 202 when correct JWT provided`, async () => {
@@ -171,7 +171,7 @@ describe('Contacts endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 });
 
