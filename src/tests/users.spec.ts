@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
-import { jwtTokenGenerator } from '../utils';
+import { jwtTokenGenerator, incorrectJWTTokenGenerator } from '../utils';
 import { UserModel } from '../models';
 
 let jwtTokenCorrect: string | null = '';
@@ -13,10 +13,10 @@ let userId = '';
 
 beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
-  jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+  jwtTokenIncorrect = incorrectJWTTokenGenerator({ id: 0, email: 'test1@test.com' });
 
   const usersList = await UserModel.find().select({ id: 1 });
-  userId = usersList[0].id;
+  userId = usersList[usersList.length - 1].id;
 
   const fakePhotos = [
     'https://www.interstatedevelopment.com/wp-content/uploads/2019/04/generic-avatar-1.jpg',
@@ -97,7 +97,7 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/users/ (POST) returns 201 when correct JWT provided`, async () => {
@@ -119,7 +119,7 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/users/1stUser (GET) returns 200 and the 1st obj from IUsers[] when correct JWT provided`, async () => {
@@ -140,7 +140,7 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/users/1stUser (PATCH) returns 202 and IUsers[] updated when correct JWT provided`, async () => {
@@ -162,7 +162,7 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/users/1stUser (DELETE) returns 202 when correct JWT provided`, async () => {
@@ -182,7 +182,7 @@ describe('Users endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 });
 

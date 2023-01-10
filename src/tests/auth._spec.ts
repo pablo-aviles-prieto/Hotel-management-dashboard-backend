@@ -24,18 +24,19 @@ describe('Auth endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
+    expect(res.body.error.message).toBe('Check the credentials and try again!');
   });
-  it(`/login (POST) return 401 and error message when incorrect mail is provided`, async () => {
+  it(`/login (POST) return 401 and error message when incorrect password is provided`, async () => {
     const res = await request(httpServer)
       .post('/login')
-      .send({ email: 'test2@test.com', password: 'test123' })
+      .send({ email: 'hotel@miranda.com', password: 'test1234' })
       .set('Content-Type', 'application/json')
       .expect(401)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.text).toMatch('Check the credentials and try again!');
+    expect(res.body.error.message).toBe('Check the credentials and try again!');
   });
 });
 

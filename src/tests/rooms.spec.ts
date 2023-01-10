@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
-import { jwtTokenGenerator } from '../utils';
+import { jwtTokenGenerator, incorrectJWTTokenGenerator } from '../utils';
 import { RoomModel } from '../models';
 
 let jwtTokenCorrect: string | null = '';
@@ -13,10 +13,10 @@ let roomId = '';
 
 beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
-  jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+  jwtTokenIncorrect = incorrectJWTTokenGenerator({ id: 0, email: 'test1@test.com' });
 
   const roomsList = await RoomModel.find().select({ id: 1 });
-  roomId = roomsList[0].id;
+  roomId = roomsList[roomsList.length - 1].id;
 
   const fakePhotos = [
     'https://pablo-aviles-prieto.github.io/hotel-management-app/assets/hotel-rooms/room1.jpg',
@@ -119,7 +119,7 @@ describe('Rooms endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/rooms (POST) returns 201 and IRooms[] when correct JWT provided`, async () => {
@@ -141,7 +141,7 @@ describe('Rooms endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/rooms/1stRoom (GET) returns 200 and the 1st obj from IRooms[] when correct JWT provided`, async () => {
@@ -162,7 +162,7 @@ describe('Rooms endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/rooms/1stRoom (PATCH) returns 202 when correct JWT provided`, async () => {
@@ -184,7 +184,7 @@ describe('Rooms endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/rooms/1stRoom (DELETE) returns 202 when correct JWT provided`, async () => {
@@ -201,10 +201,12 @@ describe('Rooms endpoints', () => {
       .delete(`/rooms/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenIncorrect}`)
       .expect(401);
+    console.log('res', res);
+    console.log('res.body', res.body);
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 });
 

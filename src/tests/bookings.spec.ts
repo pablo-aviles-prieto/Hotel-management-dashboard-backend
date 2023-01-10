@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import { faker } from '@faker-js/faker';
 import { httpServer } from '../app';
-import { jwtTokenGenerator } from '../utils';
+import { jwtTokenGenerator, incorrectJWTTokenGenerator } from '../utils';
 import { RoomModel, BookingModel } from '../models';
 
 let jwtTokenCorrect: string | null = '';
@@ -14,11 +14,11 @@ let roomId = '';
 
 beforeAll(async () => {
   jwtTokenCorrect = jwtTokenGenerator({ id: 0, email: 'test@test.com' });
-  jwtTokenIncorrect = jwtTokenGenerator({ id: 0, email: 'test1@test.com' });
+  jwtTokenIncorrect = incorrectJWTTokenGenerator({ id: 0, email: 'test1@test.com' });
 
   const bookingsList = await BookingModel.find().select({ id: 1 });
   const roomsList = await RoomModel.find().select({ id: 1 });
-  bookingId = bookingsList[0].id;
+  bookingId = bookingsList[bookingsList.length - 1].id;
   roomId = roomsList[roomsList.length - 1].id;
 
   const randomDates = faker.date.betweens('2022-01-01', '2022-12-12', 3);
@@ -70,7 +70,7 @@ describe('Bookings endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/bookings (POST) returns 201 when correct data and JWT provided`, async () => {
@@ -92,7 +92,7 @@ describe('Bookings endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/bookings/1stBooking (GET) returns 200 when correct JWT provided`, async () => {
@@ -105,11 +105,11 @@ describe('Bookings endpoints', () => {
     expect(res.ok).toBe(true);
     expect(res.error).toBeFalsy();
   });
-  it(`/bookings/1stBooking (GET) returns 400 when wrong ID supplied`, async () => {
+  it(`/bookings/1stBooking (GET) returns 404 when wrong ID supplied`, async () => {
     const res = await request(httpServer)
       .get(`/bookings/${roomId}`)
       .set('Authorization', `Bearer ${jwtTokenCorrect}`)
-      .expect(400)
+      .expect(404)
       .expect('Content-Type', /json/);
 
     expect(res.ok).toBe(false);
@@ -123,7 +123,7 @@ describe('Bookings endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/bookings/1stBooking (PATCH) returns 202 when correct JWT provided`, async () => {
@@ -145,7 +145,7 @@ describe('Bookings endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 
   it(`/bookings/1stbooking (DELETE) returns 202 when correct JWT provided`, async () => {
@@ -165,7 +165,7 @@ describe('Bookings endpoints', () => {
 
     expect(res.ok).toBe(false);
     expect(res.error).toBeTruthy();
-    expect(res.body.error).toMatch('Unauthorized');
+    expect(res.text).toMatch('Unauthorized');
   });
 });
 

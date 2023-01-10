@@ -1,34 +1,59 @@
 import mongoose from 'mongoose';
-import { Request, Response, NextFunction } from 'express';
 import { BookingModel } from '../models';
-import { BaseError } from '../errors/ErrorClass';
+import { ControllerError } from '../errors';
+import { sanitizeDate } from '../utils';
+import { Request, Response, NextFunction } from 'express';
 
 export const getBookingsList = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bookingsList = await BookingModel.find().populate('roomId');
+    if (bookingsList.length === 0) {
+      next(new ControllerError({ name: 'Error bookings list', message: `Couldn't find any booking`, status: 404 }));
+      return;
+    }
     res.status(200).json({ result: bookingsList });
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error) {
+      next(
+        new ControllerError({
+          name: 'Error bookings list',
+          message: 'Error getting the bookings list on Mongo',
+          status: 400,
+          additionalMessage: error.message
+        })
+      );
+      return;
+    }
+    next(new ControllerError({ name: 'Error bookings list', message: 'Error getting the bookings list', status: 500 }));
   }
 };
 
 export const createBooking = async (req: Request, res: Response, next: NextFunction) => {
   const { orderDate, checkIn, checkOut } = req.body;
 
-  const booking = new BookingModel({
-    ...req.body,
-    orderDate: orderDate
-      ? new Date(orderDate).toISOString().substring(0, 10)
-      : new Date().toISOString().substring(0, 10),
-    checkIn: new Date(checkIn).toISOString().substring(0, 10),
-    checkOut: new Date(checkOut).toISOString().substring(0, 10)
-  });
-
   try {
+    const booking = new BookingModel({
+      ...req.body,
+      orderDate: orderDate ? sanitizeDate(orderDate) : new Date().toISOString().substring(0, 10),
+      checkIn: sanitizeDate(checkIn),
+      checkOut: sanitizeDate(checkOut)
+    });
+
     const result = await booking.save();
     res.status(201).json({ result });
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error) {
+      next(
+        new ControllerError({
+          name: 'Error creating booking',
+          message: 'Error creating the booking on Mongo',
+          status: 400,
+          additionalMessage: error.message
+        })
+      );
+      return;
+    }
+    next(new ControllerError({ name: 'Error creating booking', message: 'Error creating the booking', status: 500 }));
   }
 };
 
@@ -37,21 +62,48 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
 
   try {
     const booking = await BookingModel.findById(bookingId).populate('roomId').exec();
-    if (!booking) return res.status(400).json({ result: 'Error fetching the booking' });
+    if (!booking) {
+      next(
+        new ControllerError({
+          name: 'Error single booking',
+          message: `Couldn't find the selected booking`,
+          status: 404
+        })
+      );
+      return;
+    }
     res.status(200).json({ result: booking });
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error) {
+      next(
+        new ControllerError({
+          name: 'Error single booking',
+          message: 'Error getting the booking on Mongo',
+          status: 400,
+          additionalMessage: error.message
+        })
+      );
+      return;
+    }
+    next(new ControllerError({ name: 'Error single booking', message: 'Error getting the booking', status: 500 }));
   }
 };
 
 export const editBooking = async (req: Request, res: Response, next: NextFunction) => {
   const { bookingId } = req.params;
 
-  const sanitizeDate = (date: string) => new Date(date).toISOString().substring(0, 10);
-
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
-    if (!existBooking) return res.status(400).send({ result: 'Error fetching the user' });
+    if (!existBooking) {
+      next(
+        new ControllerError({
+          name: 'Error editing booking',
+          message: `Couldn't find the selected booking`,
+          status: 404
+        })
+      );
+      return;
+    }
 
     const sanitizeBookingProps: { [key: string]: Function } = {
       orderDate: (date: string) => sanitizeDate(date),
@@ -71,7 +123,18 @@ export const editBooking = async (req: Request, res: Response, next: NextFunctio
 
     res.status(202).json({ result: existBooking });
   } catch (error) {
-    next(error);
+    if (error instanceof mongoose.Error) {
+      next(
+        new ControllerError({
+          name: 'Error editing booking',
+          message: 'Error editing the booking on Mongo',
+          status: 400,
+          additionalMessage: error.message
+        })
+      );
+      return;
+    }
+    next(new ControllerError({ name: 'Error editing booking', message: 'Error editing the booking', status: 500 }));
   }
 };
 
@@ -80,16 +143,32 @@ export const deleteBooking = async (req: Request, res: Response, next: NextFunct
 
   try {
     const existBooking = await BookingModel.findById(bookingId).exec();
-    if (!existBooking) return next(new BaseError({ message: 'The booking does not exist', status: 400 }));
+    if (!existBooking) {
+      next(
+        new ControllerError({
+          name: 'Error deleting booking',
+          message: `Couldn't find the selected booking`,
+          status: 400
+        })
+      );
+      return;
+    }
 
     await existBooking.delete();
 
     res.status(202).json({ result: 'Booking deleted successfully' });
   } catch (error) {
     if (error instanceof mongoose.Error) {
-      next(new BaseError({ message: 'Error deleting bookings', status: 400, additionalMessage: error.message }));
+      next(
+        new ControllerError({
+          name: 'Error deleting booking',
+          message: 'Error deleting the booking on Mongo',
+          status: 400,
+          additionalMessage: error.message
+        })
+      );
       return;
     }
-    next(new BaseError({ message: 'Generic error deleting booking', status: 500 }));
+    next(new ControllerError({ name: 'Error deleting booking', message: 'Error deleting the booking', status: 500 }));
   }
 };
