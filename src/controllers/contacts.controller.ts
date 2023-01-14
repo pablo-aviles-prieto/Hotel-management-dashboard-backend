@@ -5,18 +5,18 @@ import { Request, Response, NextFunction } from 'express';
 
 export const getContactsList = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const usersList = await ContactModel.find().exec();
-    if (usersList.length === 0) {
-      next(new ControllerError({ name: 'Error contacts list', message: `Couldn't find any contact`, status: 404 }));
+    const contactList = await ContactModel.find().exec();
+    if (contactList.length === 0) {
+      next(new ControllerError({ name: 'Error contact list', message: `Couldn't find any contact`, status: 404 }));
       return;
     }
-    res.status(200).json({ result: usersList });
+    res.status(200).json({ result: contactList });
   } catch (error) {
     if (error instanceof mongoose.Error) {
       next(
         new ControllerError({
-          name: 'Error users list',
-          message: 'Error getting the contacts list on Mongo',
+          name: 'Error contact list',
+          message: 'Error getting the contact list on Mongo',
           status: 400,
           additionalMessage: error.message
         })
@@ -44,7 +44,7 @@ export const createContact = async (req: Request, res: Response, next: NextFunct
     if (error instanceof mongoose.Error) {
       next(
         new ControllerError({
-          name: 'Error creating user',
+          name: 'Error creating contact',
           message: 'Error creating the contact on Mongo',
           status: 400,
           additionalMessage: error.message
@@ -60,24 +60,24 @@ export const getSingleContact = async (req: Request, res: Response, next: NextFu
   const { contactId } = req.params;
 
   try {
-    const user = await ContactModel.findById(contactId).exec();
-    if (!user) {
+    const contact = await ContactModel.findById(contactId).exec();
+    if (!contact) {
       next(
         new ControllerError({
-          name: 'Error single user',
+          name: 'Error single contact',
           message: `Couldn't find the selected contact`,
           status: 404
         })
       );
       return;
     }
-    res.status(200).json({ result: user });
+    res.status(200).json({ result: contact });
   } catch (error) {
     if (error instanceof mongoose.Error) {
       next(
         new ControllerError({
           name: 'Error single contact',
-          message: 'Error getting the user on Mongo',
+          message: 'Error getting the contact on Mongo',
           status: 400,
           additionalMessage: error.message
         })
@@ -96,7 +96,7 @@ export const editContact = async (req: Request, res: Response, next: NextFunctio
     if (!existContact) {
       next(
         new ControllerError({
-          name: 'Error editing user',
+          name: 'Error editing contact',
           message: `Couldn't find the selected contact`,
           status: 404
         })
