@@ -35,7 +35,11 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
   try {
     const existingUserByEmail = await UserModel.findOne({ email }).exec();
-    if (existingUserByEmail) return res.status(400).json({ result: 'Error creating the user' });
+    if (existingUserByEmail) {
+      return next(
+        new ControllerError({ name: 'Error creating user', message: `Email already registered`, status: 409 })
+      );
+    }
 
     const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
     const hashedPassword = hashSync(password, salt);
