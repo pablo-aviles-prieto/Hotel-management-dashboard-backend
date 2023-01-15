@@ -17,7 +17,7 @@ export const getBookingsList = async (req: Request, res: Response, next: NextFun
       next(
         new ControllerError({
           name: 'Error bookings list',
-          message: 'Error getting the bookings list on Mongo',
+          message: 'Error getting the bookings list from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -46,7 +46,7 @@ export const createBooking = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error creating booking',
-          message: 'Error creating the booking on Mongo',
+          message: 'Error creating the booking on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -78,7 +78,7 @@ export const getSingleBooking = async (req: Request, res: Response, next: NextFu
       next(
         new ControllerError({
           name: 'Error single booking',
-          message: 'Error getting the booking on Mongo',
+          message: 'Error getting the booking from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -127,7 +127,7 @@ export const editBooking = async (req: Request, res: Response, next: NextFunctio
       next(
         new ControllerError({
           name: 'Error editing booking',
-          message: 'Error editing the booking on Mongo',
+          message: 'Error editing the booking on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -162,7 +162,7 @@ export const deleteBooking = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error deleting booking',
-          message: 'Error deleting the booking on Mongo',
+          message: 'Error deleting the booking on DB',
           status: 400,
           additionalMessage: error.message
         })

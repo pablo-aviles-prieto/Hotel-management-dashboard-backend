@@ -16,7 +16,7 @@ export const getRoomsList = async (req: Request, res: Response, next: NextFuncti
       next(
         new ControllerError({
           name: 'Error rooms list',
-          message: 'Error getting the rooms list on Mongo',
+          message: 'Error getting the rooms list from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -64,7 +64,7 @@ export const createRoom = async (req: Request, res: Response, next: NextFunction
       next(
         new ControllerError({
           name: 'Error creating room',
-          message: 'Error creating the room on Mongo',
+          message: 'Error creating the room on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -96,7 +96,7 @@ export const getSingleRoom = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error single room',
-          message: 'Error getting the room on Mongo',
+          message: 'Error getting the room from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -143,7 +143,7 @@ export const editRoom = async (req: Request, res: Response, next: NextFunction) 
       next(
         new ControllerError({
           name: 'Error editing room',
-          message: 'Error editing the room on Mongo',
+          message: 'Error editing the room on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -179,7 +179,7 @@ export const deleteRoom = async (req: Request, res: Response, next: NextFunction
       next(
         new ControllerError({
           name: 'Error deleting room',
-          message: 'Error deleting the room on Mongo',
+          message: 'Error deleting the room on DB',
           status: 400,
           additionalMessage: error.message
         })

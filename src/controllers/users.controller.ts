@@ -19,7 +19,7 @@ export const getUsersList = async (req: Request, res: Response, next: NextFuncti
       next(
         new ControllerError({
           name: 'Error users list',
-          message: 'Error getting the users list on Mongo',
+          message: 'Error getting the users list from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -62,7 +62,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
       next(
         new ControllerError({
           name: 'Error creating user',
-          message: 'Error creating the user on Mongo',
+          message: 'Error creating the user on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -94,7 +94,7 @@ export const getSingleUser = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error single user',
-          message: 'Error getting the user on Mongo',
+          message: 'Error getting the user from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -148,7 +148,7 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
       next(
         new ControllerError({
           name: 'Error editing user',
-          message: 'Error editing the user on Mongo',
+          message: 'Error editing the user on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -183,7 +183,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
       next(
         new ControllerError({
           name: 'Error deleting user',
-          message: 'Error deleting the user on Mongo',
+          message: 'Error deleting the user on DB',
           status: 400,
           additionalMessage: error.message
         })

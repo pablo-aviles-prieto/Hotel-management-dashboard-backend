@@ -16,7 +16,7 @@ export const getContactsList = async (req: Request, res: Response, next: NextFun
       next(
         new ControllerError({
           name: 'Error contact list',
-          message: 'Error getting the contact list on Mongo',
+          message: 'Error getting the contact list from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -45,7 +45,7 @@ export const createContact = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error creating contact',
-          message: 'Error creating the contact on Mongo',
+          message: 'Error creating the contact on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -77,7 +77,7 @@ export const getSingleContact = async (req: Request, res: Response, next: NextFu
       next(
         new ControllerError({
           name: 'Error single contact',
-          message: 'Error getting the contact on Mongo',
+          message: 'Error getting the contact from DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -132,7 +132,7 @@ export const editContact = async (req: Request, res: Response, next: NextFunctio
       next(
         new ControllerError({
           name: 'Error editing contact',
-          message: 'Error editing the contact on Mongo',
+          message: 'Error editing the contact on DB',
           status: 400,
           additionalMessage: error.message
         })
@@ -167,7 +167,7 @@ export const deleteContact = async (req: Request, res: Response, next: NextFunct
       next(
         new ControllerError({
           name: 'Error deleting contact',
-          message: 'Error deleting the contact on Mongo',
+          message: 'Error deleting the contact on DB',
           status: 400,
           additionalMessage: error.message
         })
