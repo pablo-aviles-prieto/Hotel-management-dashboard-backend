@@ -111,12 +111,24 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
 
   try {
     const existUser = await UserModel.findById(userId).exec();
+
     if (!existUser) {
       next(
         new ControllerError({
           name: 'Error editing user',
           message: `Couldn't find the selected user`,
           status: 404
+        })
+      );
+      return;
+    }
+
+    if (existUser.email === 'hotel@miranda.com') {
+      next(
+        new ControllerError({
+          name: 'Error editing root user',
+          message: `This user is not editable!`,
+          status: 409
         })
       );
       return;
@@ -164,12 +176,24 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
   try {
     const existUser = await UserModel.findById(userId).exec();
+
     if (!existUser) {
       next(
         new ControllerError({
           name: 'Error deleting user',
           message: `Couldn't find the selected user`,
           status: 400
+        })
+      );
+      return;
+    }
+
+    if (existUser.email === 'hotel@miranda.com') {
+      next(
+        new ControllerError({
+          name: 'Error deleting root user',
+          message: `This user is not deletable!`,
+          status: 409
         })
       );
       return;
