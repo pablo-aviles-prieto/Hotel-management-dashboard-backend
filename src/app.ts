@@ -2,6 +2,7 @@ import 'dotenv/config';
 
 import http from 'http';
 import cors from 'cors';
+import path from 'path';
 import express from 'express';
 import * as loaders from './loaders';
 import { errorHandler } from './middlewares';
@@ -15,6 +16,7 @@ const app = express();
 app.use(cors({ origin: DOMAINS }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, '../public')));
 loaders.router(app);
 loaders.createPassportInstance();
 void loaders.mongodb();

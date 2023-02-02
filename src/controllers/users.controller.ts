@@ -1,10 +1,13 @@
+import { unlink } from 'fs';
+import path from 'path';
 import mongoose from 'mongoose';
 import { hashSync } from 'bcryptjs';
 import { UserModel } from '../models';
 import { ControllerError } from '../errors';
 import { Request, Response, NextFunction } from 'express';
+import { IUsers } from '../interfaces';
 
-const { BCRYPT_SALT } = process.env;
+const { BCRYPT_SALT, SELF_HOST_URI } = process.env;
 
 export const getUsersList = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -31,7 +34,10 @@ export const getUsersList = async (req: Request, res: Response, next: NextFuncti
 };
 
 export const createUser = async (req: Request, res: Response, next: NextFunction) => {
-  const { photo, name, email, password, startDate, job, contact, status } = req.body;
+  const { email, password } = req.body;
+  if (!req.file) {
+    return next(new ControllerError({ name: 'Error creating user', message: `Required photo not found`, status: 400 }));
+  }
 
   try {
     const existingUserByEmail = await UserModel.findOne({ email }).exec();
@@ -44,15 +50,14 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
     const hashedPassword = hashSync(password, salt);
 
+    const url = `${SELF_HOST_URI}/images/${req.file.filename}`;
+    const parsedJob = JSON.parse(req.body.job);
+
     const user = new UserModel({
-      photo,
-      name,
-      email,
-      password: hashedPassword,
-      startDate,
-      job,
-      contact,
-      status
+      ...req.body,
+      job: parsedJob,
+      photo: url,
+      password: hashedPassword
     });
 
     const result = await user.save();
@@ -110,7 +115,7 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
   const { password } = req.body;
 
   try {
-    const existUser = await UserModel.findById(userId).exec();
+    const existUser = <IUsers | null>await UserModel.findById(userId).exec();
 
     if (!existUser) {
       next(
@@ -136,9 +141,10 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
 
     for (const property in req.body) {
       if (property === 'job') {
+        const parsedJob = JSON.parse(req.body.job);
         const newJobProps = {
           ...existUser.job,
-          ...req.body.job
+          ...parsedJob
         };
         existUser.job = newJobProps;
         continue;
@@ -150,8 +156,26 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
         existUser.password = hashedPassword;
         continue;
       }
+      if (property === 'photo') continue;
       existUser[property] = req.body[property];
     }
+
+    if (req.file) {
+      const fileName = existUser.photo.replace(`${SELF_HOST_URI}/images/`, '');
+      const filePath = `${path.join(__dirname, `../../public/images/${fileName}`)}`;
+
+      unlink(filePath, (err) => {
+        if (err) {
+          // Even if the server couldn't find the image, I return 202 since its a backend bug and the product was deleted, so I rather return that feedback to the UX.
+          console.error(`${fileName} not found on server!`);
+        } else {
+          console.info(`${fileName} deleted from server`);
+        }
+      });
+
+      existUser.photo = `${SELF_HOST_URI}/images/${req.file.filename}`;
+    }
+
     await existUser.save();
 
     res.status(202).json({ result: existUser });
@@ -175,7 +199,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
   const { userId } = req.params;
 
   try {
-    const existUser = await UserModel.findById(userId).exec();
+    const existUser = <IUsers | null>await UserModel.findById(userId).exec();
 
     if (!existUser) {
       next(
@@ -199,7 +223,19 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
       return;
     }
 
+    const fileName = existUser.photo.replace(`${SELF_HOST_URI}/images/`, '');
+    const filePath = `${path.join(__dirname, `../../public/images/${fileName}`)}`;
+
     await existUser.delete();
+
+    unlink(filePath, (err) => {
+      if (err) {
+        // Even if the server couldn't find the image, I return 202 since its a backend bug and the product was deleted, so I rather return that feedback to the UX.
+        console.error(`${fileName} not found on server!`);
+      } else {
+        console.info(`${fileName} deleted from server`);
+      }
+    });
 
     res.status(202).json({ result: 'User deleted successfully' });
   } catch (error) {
