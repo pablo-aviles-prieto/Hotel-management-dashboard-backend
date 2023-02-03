@@ -1,3 +1,5 @@
+import { Document } from 'mongoose';
+
 export interface IContacts {
   id?: string;
   date: string;
@@ -7,7 +9,7 @@ export interface IContacts {
   archived?: boolean;
 }
 
-export interface IUsers {
+export interface IUsers extends Document {
   id?: string;
   photo: string;
   name: string;
@@ -17,19 +19,21 @@ export interface IUsers {
   job: { position?: string; description?: string; schedule?: string };
   contact: string;
   status: string;
+  [key: string]: any;
 }
 
-export interface IRooms {
+export interface IRooms extends Document {
   id?: string;
   photo: string;
-  roomNumber: string;
+  roomNumber: number;
   roomName: string;
   bedType: string;
   roomFloor: string;
   facilities: string[];
   ratePerNight: number;
   status: string;
-  offerPrice: string | null;
+  offerPrice: number | null;
+  [key: string]: any;
 }
 
 export interface IBookings {
