@@ -50,13 +50,13 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     const salt = BCRYPT_SALT ? Number(BCRYPT_SALT) : 12;
     const hashedPassword = hashSync(password, salt);
 
-    const url = `${SELF_HOST_URI}/images/${req.file.filename}`;
+    const photoUrl = `${SELF_HOST_URI}/images/${req.file.filename}`;
     const parsedJob = JSON.parse(req.body.job);
 
     const user = new UserModel({
       ...req.body,
       job: parsedJob,
-      photo: url,
+      photo: photoUrl,
       password: hashedPassword
     });
 
@@ -167,9 +167,9 @@ export const editUser = async (req: Request, res: Response, next: NextFunction) 
       unlink(filePath, (err) => {
         if (err) {
           // Even if the server couldn't find the image, I return 202 since its a backend bug and the product was deleted, so I rather return that feedback to the UX.
-          console.error(`${fileName} not found on server!`);
+          console.error(`User img ${fileName} not found on server!`);
         } else {
-          console.info(`${fileName} deleted from server`);
+          console.info(`User img ${fileName} deleted from server`);
         }
       });
 
@@ -231,9 +231,9 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
     unlink(filePath, (err) => {
       if (err) {
         // Even if the server couldn't find the image, I return 202 since its a backend bug and the product was deleted, so I rather return that feedback to the UX.
-        console.error(`${fileName} not found on server!`);
+        console.error(`User img ${fileName} not found on server!`);
       } else {
-        console.info(`${fileName} deleted from server`);
+        console.info(`User img ${fileName} deleted from server`);
       }
     });
 
